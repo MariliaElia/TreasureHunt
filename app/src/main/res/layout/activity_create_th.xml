@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:orientation="vertical"
+    android:layout_marginTop="50dp"
+    tools:contexts = "tabian.com.datepickerdialog.CreateTH">
+
+    <EditText
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/title" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/openDate"
+        android:id="@+id/openDate"
+        android:textSize="18dp"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/closingDate"
+        android:id="@+id/closingDate"
+        android:textSize="18dp"
+        android:layout_marginTop="10dp"/>
+    <EditText
+        android:id="@+id/country"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/country" />
+    <EditText
+        android:id="@+id/town"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/town" />
+    <EditText
+        android:id="@+id/description"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="top"
+        android:hint="@string/description" />
+    <Button
+        android:id="@+id/addClues"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:text="@string/addClues" />
+
+</LinearLayout>

@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Treasure Hunt</string>
+    <string name="create_activity">Create Treasure Hunt</string>
+    <string name="title">Title</string>#
+    <string name="openDate">Select Open Date</string>
+    <string name="closingDate">Select Close Date</string>
+    <string name="country">Country</string>
+    <string name="town">Town</string>
+    <string name="description">Description</string>
+    <string name="addClues">Add Clue</string>
+</resources>
