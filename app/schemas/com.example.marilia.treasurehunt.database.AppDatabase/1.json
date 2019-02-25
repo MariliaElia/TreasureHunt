@@ -2,17 +2,23 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "e6c182744aa7b3badd77a7d22484af25",
+    "identityHash": "e5d90dd4daa7ef919e906e316aaa9d21",
     "entities": [
       {
         "tableName": "User",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `first_name` TEXT, `last_name` TEXT, `dob` TEXT, `email` TEXT, `points` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `uuid` TEXT, `first_name` TEXT, `last_name` TEXT, `username` TEXT NOT NULL, `password` TEXT NOT NULL, `dob` TEXT, `email` TEXT NOT NULL, `points` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "id",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "uuid",
+            "columnName": "uuid",
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "first_name",
@@ -27,6 +33,18 @@
             "notNull": false
           },
           {
+            "fieldPath": "username",
+            "columnName": "username",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "password",
+            "columnName": "password",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
             "fieldPath": "dob",
             "columnName": "dob",
             "affinity": "TEXT",
@@ -36,7 +54,7 @@
             "fieldPath": "email",
             "columnName": "email",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "points",
@@ -51,12 +69,29 @@
           ],
           "autoGenerate": true
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_User_username",
+            "unique": true,
+            "columnNames": [
+              "username"
+            ],
+            "createSql": "CREATE UNIQUE INDEX `index_User_username` ON `${TABLE_NAME}` (`username`)"
+          },
+          {
+            "name": "index_User_email",
+            "unique": true,
+            "columnNames": [
+              "email"
+            ],
+            "createSql": "CREATE UNIQUE INDEX `index_User_email` ON `${TABLE_NAME}` (`email`)"
+          }
+        ],
         "foreignKeys": []
       },
       {
         "tableName": "TreasureHunt",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `user_id` INTEGER NOT NULL, `title` TEXT, `description` TEXT, `date_created` INTEGER, `open_on` INTEGER, `close_on` INTEGER, `country` TEXT, `town` TEXT, FOREIGN KEY(`user_id`) REFERENCES `User`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `user_id` INTEGER NOT NULL, `title` TEXT, `description` TEXT, `date_created` INTEGER, `open_on` INTEGER, `close_on` INTEGER, `country` TEXT, `town` TEXT, FOREIGN KEY(`user_id`) REFERENCES `User`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -132,7 +167,7 @@
         "foreignKeys": [
           {
             "table": "User",
-            "onDelete": "NO ACTION",
+            "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
               "user_id"
@@ -216,7 +251,7 @@
       },
       {
         "tableName": "Player",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `start_date` INTEGER, `start_time` INTEGER, `end_date` INTEGER, `end_time` INTEGER, `total_points` INTEGER NOT NULL, `successful_clues` INTEGER NOT NULL, `status` TEXT, `th_id` INTEGER NOT NULL, FOREIGN KEY(`th_id`) REFERENCES `TreasureHunt`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `start_date` INTEGER, `start_time` INTEGER, `end_date` INTEGER, `end_time` INTEGER, `total_points` INTEGER NOT NULL, `successful_clues` INTEGER NOT NULL, `status` TEXT, `th_id` INTEGER NOT NULL, `user_id` INTEGER NOT NULL, FOREIGN KEY(`th_id`) REFERENCES `TreasureHunt`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`user_id`) REFERENCES `User`(`id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
         "fields": [
           {
             "fieldPath": "id",
@@ -271,6 +306,12 @@
             "columnName": "th_id",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "user_id",
+            "columnName": "user_id",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -300,13 +341,24 @@
             "referencedColumns": [
               "id"
             ]
+          },
+          {
+            "table": "User",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "user_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
           }
         ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"e6c182744aa7b3badd77a7d22484af25\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"e5d90dd4daa7ef919e906e316aaa9d21\")"
     ]
   }
 }

@@ -10,10 +10,11 @@ import java.util.Date;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
-@Entity(indices = @Index("th_id"), foreignKeys = @ForeignKey(entity = TreasureHunt.class,
+@Entity(indices = @Index("th_id"), foreignKeys ={@ForeignKey(entity = TreasureHunt.class,
         parentColumns = "id",
         childColumns = "th_id",
-        onDelete=CASCADE))
+        onDelete=CASCADE),@ForeignKey(entity = User.class,
+        parentColumns = "id", childColumns = "user_id")})
 public class Player {
     @PrimaryKey(autoGenerate = true) public int id;
 
@@ -31,8 +32,9 @@ public class Player {
     public String status;
 
     public int th_id;
+    public int user_id;
 
-    public Player(Date start_date, Date start_time, Date end_date, Date end_time, int total_points, int successful_clues, String status, int th_id){
+    public Player(Date start_date, Date start_time, Date end_date, Date end_time, int total_points, int successful_clues, String status, int th_id, int user_id){
         this.start_date = start_date;
         this.start_time = start_time;
         this.end_date = end_date;
@@ -42,6 +44,7 @@ public class Player {
         this.status = status;
 
         this.th_id = th_id;
+        this.user_id = user_id;
     }
 
     //Getters

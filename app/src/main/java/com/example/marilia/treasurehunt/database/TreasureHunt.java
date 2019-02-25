@@ -8,8 +8,14 @@ import android.arch.persistence.room.TypeConverters;
 
 import java.util.Date;
 
+import static android.arch.persistence.room.ForeignKey.CASCADE;
 
-@Entity(indices = @Index("user_id"), foreignKeys = @ForeignKey(entity = User.class, parentColumns = "id", childColumns = "user_id"))
+
+@Entity(indices = @Index("user_id"),
+        foreignKeys = @ForeignKey(entity = User.class,
+                parentColumns = "id",
+                childColumns = "user_id",
+                onDelete = CASCADE))
 public class TreasureHunt {
     @PrimaryKey(autoGenerate = true) int id;
 
@@ -28,7 +34,7 @@ public class TreasureHunt {
     public String country;
     public String town;
 
-    public TreasureHunt(String title, String description, Date date_created, Date open_on, Date close_on, String country, String town) {
+    public TreasureHunt(String title, String description, Date date_created, Date open_on, Date close_on, String country, String town, int user_id) {
         this.title = title;
         this.description = description;
         this.date_created = date_created;
@@ -36,6 +42,7 @@ public class TreasureHunt {
         this.close_on = close_on;
         this.country = country;
         this.town = town;
+        this.user_id = user_id;
     }
 
     //Getters

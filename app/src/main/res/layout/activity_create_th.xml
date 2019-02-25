@@ -46,10 +46,16 @@
         android:gravity="top"
         android:hint="@string/description" />
     <Button
-        android:id="@+id/addClues"
+        android:id="@+id/addClue"
         android:layout_width="100dp"
         android:layout_height="wrap_content"
         android:layout_gravity="right"
         android:text="@string/addClues" />
+    <Button
+        android:id="@+id/createTH"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:text="@string/createTH" />
 
 </LinearLayout>

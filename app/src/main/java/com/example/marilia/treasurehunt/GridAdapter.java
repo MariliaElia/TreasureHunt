@@ -1,24 +1,33 @@
 package com.example.marilia.treasurehunt;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
-public class ImageAdapter extends BaseAdapter {
+public class GridAdapter extends BaseAdapter {
     private Context mContext;
 
-    public ImageAdapter(Context c) {
+    // references to images
+    private Integer[] imageIds = {
+            R.drawable.gps,
+            R.drawable.edit,
+            R.drawable.loupe,
+            R.drawable.user
+    };
+
+    public GridAdapter(Context c) {
         mContext = c;
     }
 
     public int getCount() {
-        return images.length;
+        return imageIds.length;
     }
 
     public Object getItem(int position) {
-        return null;
+        return imageIds[position];
     }
 
     public long getItemId(int position) {
@@ -26,28 +35,30 @@ public class ImageAdapter extends BaseAdapter {
     }
 
     // create a new ImageView for each item referenced by the Adapter
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         ImageView imageView;
         if (convertView == null) {
-            // if it's not recycled, initialize some attributes
             imageView = new ImageView(mContext);
             imageView.setLayoutParams(new ViewGroup.LayoutParams(600, 600));
-
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             imageView.setPadding(8, 8, 8, 8);
+
+            imageView.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View view) {
+                    Log.d("onClick","position ["+position+"]");
+                }
+
+            });
+
         } else {
             imageView = (ImageView) convertView;
         }
 
-        imageView.setImageResource(images[position]);
+        imageView.setImageResource(imageIds[position]);
         return imageView;
     }
 
-    // references to our images
-    private Integer[] images = {
-            R.drawable.gps,
-            R.drawable.edit,
-            R.drawable.loupe,
-            R.drawable.user
-    };
+
 }
