@@ -32,14 +32,10 @@ public class MainActivity extends AppCompatActivity {
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
                 Intent intent;
-                Log.d(TAG, Integer.toString(position));
-                
                 switch (position)
                 {
                     case 0:
-                        Log.d(TAG, "INSIDE CASE 0");
                         intent = new Intent(v.getContext(), CreateTH.class);
-                        startActivity(intent);
                         break;
                     case 1:
                         intent = new Intent(v.getContext(), CreateTH.class);

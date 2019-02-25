@@ -1,6 +1,7 @@
 package com.example.marilia.treasurehunt;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,16 +44,7 @@ public class GridAdapter extends BaseAdapter {
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             imageView.setPadding(8, 8, 8, 8);
 
-            imageView.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View view) {
-                    Log.d("onClick","position ["+position+"]");
-                }
-
-            });
-
-        } else {
+        }else {
             imageView = (ImageView) convertView;
         }
 
