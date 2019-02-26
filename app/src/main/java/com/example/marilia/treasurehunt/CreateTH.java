@@ -42,31 +42,34 @@ public class CreateTH extends AppCompatActivity {
     int year = cal.get(Calendar.YEAR);
     int month = cal.get(Calendar.MONTH);
     int day = cal.get(Calendar.DAY_OF_MONTH);
+    String currentDate = day + "-" + month + "-" + year;
 
     private static AppDatabase db;
     private static boolean databaseLoaded=false;
 
-    public EditText titleText, descriptionText, countryText, townText;
+    public EditText titleText, descriptionText, countryText, cityText;
     public String title, description, country, town;
     public Date dateCreated, openDate, closingDate;
     public Button createTHBn, addClueBn;
+
+    private SharedPreferenceConfig preferenceConfig;
+    String username;
+    User user;
+    int userID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_th);
 
+        preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
+
         titleText = (EditText) findViewById(R.id.title);
         descriptionText = (EditText) findViewById(R.id.description);
-        townText = (EditText) findViewById(R.id.town);
+        cityText = (EditText) findViewById(R.id.city);
         countryText = (EditText) findViewById(R.id.country);
         createTHBn = (Button) findViewById(R.id.createTH);
-        String date = day + "/" + month + "/" + year;
-        try {
-            dateCreated = new SimpleDateFormat("dd/MM/yyyy").parse(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        dateCreated = stringToDate(currentDate);
 
         /* Select Open Date */
         //Get view element for open date
@@ -98,15 +101,30 @@ public class CreateTH extends AppCompatActivity {
             }
         });*/
 
+        //Get current user
+        user = preferenceConfig.getUserLoggedIn();
+        username = user.username;
+
         createTHBn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Find id of current user
+                new SearchDatabaseTask().execute();
+
+                //Get information user has input
                 title = titleText.getText().toString();
                 description = descriptionText.getText().toString();
-                town = townText.getText().toString();
+                town = cityText.getText().toString();
                 country = countryText.getText().toString();
 
                 new InsertIntoDatabaseTask().execute();
+
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                Toast toast = Toast.makeText(getApplicationContext(),
+                        "Treasure Hunt created.",
+                        Toast.LENGTH_SHORT);
+                toast.show();
+                finish();
             }
         });
     }
@@ -114,13 +132,24 @@ public class CreateTH extends AppCompatActivity {
     /** Database **/
 
     private class InsertIntoDatabaseTask extends AsyncTask<Void, Void, Void> {
-
         @Override
         protected Void doInBackground(Void... voids) {
-            TreasureHunt th = new TreasureHunt(title, description, dateCreated, dateCreated, dateCreated, country, town, MainActivity.user.getUserId());
+            Log.d(TAG, "Insert into database this userID: "+ userID);
+            TreasureHunt th = new TreasureHunt(title, description, dateCreated, openDate, closingDate, country, town, userID);
             Login.appDatabase.treasureHuntDao().insertTreasureHunt(th);
-            Log.d(TAG,title + " " + description + " " + country + " " + town + " " + dateCreated);
+            Log.d(TAG,title + " " + description + " " + country + " " + town + " " + dateCreated + " " + openDate + " " + closingDate);
 
+            return null;
+        }
+    }
+
+    private class SearchDatabaseTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            Log.d(TAG, "This is the current user username: " + username);
+            userID = Login.appDatabase.userDao().getUserID(username);
+
+            Log.d(TAG, "This is the current user ID: "+ userID );
             return null;
         }
     }
@@ -135,9 +164,15 @@ public class CreateTH extends AppCompatActivity {
         @Override
         public void onDateSet(DatePicker view, int year, int month, int day) {
             month = month + 1;
-            Log.d(TAG, "date: " + day + "/" + month + "/" + year);
-            String date = day + "/" + month + "/" + year;
+            String date = day + "-" + month + "-" + year;
+            Log.d(TAG, date);
             activeDateDisplay.setText(date);
+            if (activeDateDisplay == displayOpenDate) {
+                openDate = stringToDate(date);
+            } else if (activeDateDisplay == displayClosingDate){
+                closingDate = stringToDate(date);
+            }
+
             unregisterDateDisplay();
         }
     };
@@ -155,6 +190,16 @@ public class CreateTH extends AppCompatActivity {
                 return dialog;
         }
         return null;
+    }
+
+    public Date stringToDate(String dateString){
+        try {
+            dateCreated = new SimpleDateFormat("dd-MM-yyyy").parse(dateString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return dateCreated;
     }
 
 }

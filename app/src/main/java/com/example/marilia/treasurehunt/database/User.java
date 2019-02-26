@@ -9,7 +9,6 @@ import android.support.annotation.NonNull;
 public class User {
     @PrimaryKey(autoGenerate = true) public int id;
     public String uuid;
-
     public String first_name;
     public String last_name;
     @NonNull public String username;

@@ -11,15 +11,13 @@ import java.util.Date;
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
 
-@Entity(indices = @Index("user_id"),
+@Entity(indices = @Index(value = "id", unique = true),
         foreignKeys = @ForeignKey(entity = User.class,
                 parentColumns = "id",
                 childColumns = "user_id",
                 onDelete = CASCADE))
 public class TreasureHunt {
     @PrimaryKey(autoGenerate = true) int id;
-
-    public int user_id;
 
     public String title;
     public String description;
@@ -33,6 +31,8 @@ public class TreasureHunt {
 
     public String country;
     public String town;
+
+    public int user_id;
 
     public TreasureHunt(String title, String description, Date date_created, Date open_on, Date close_on, String country, String town, int user_id) {
         this.title = title;

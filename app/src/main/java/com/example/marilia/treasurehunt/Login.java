@@ -84,6 +84,7 @@ public class Login extends AppCompatActivity {
                     Log.d(TAG, "I AM IN");
                     startActivity(new Intent(getApplicationContext(), MainActivity.class));
                     preferenceConfig.setLoginStatus(true);
+                    preferenceConfig.storeUserData(user);
                     finish();
                 }
             }else{

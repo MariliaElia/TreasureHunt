@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "e5d90dd4daa7ef919e906e316aaa9d21",
+    "identityHash": "e639ded2cd81f623ca1c6f25e385d993",
     "entities": [
       {
         "tableName": "User",
@@ -91,17 +91,11 @@
       },
       {
         "tableName": "TreasureHunt",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `user_id` INTEGER NOT NULL, `title` TEXT, `description` TEXT, `date_created` INTEGER, `open_on` INTEGER, `close_on` INTEGER, `country` TEXT, `town` TEXT, FOREIGN KEY(`user_id`) REFERENCES `User`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT, `description` TEXT, `date_created` INTEGER, `open_on` INTEGER, `close_on` INTEGER, `country` TEXT, `town` TEXT, `user_id` INTEGER NOT NULL, FOREIGN KEY(`user_id`) REFERENCES `User`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "user_id",
-            "columnName": "user_id",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -146,6 +140,12 @@
             "columnName": "town",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "user_id",
+            "columnName": "user_id",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -157,11 +157,11 @@
         "indices": [
           {
             "name": "index_TreasureHunt_user_id",
-            "unique": false,
+            "unique": true,
             "columnNames": [
               "user_id"
             ],
-            "createSql": "CREATE  INDEX `index_TreasureHunt_user_id` ON `${TABLE_NAME}` (`user_id`)"
+            "createSql": "CREATE UNIQUE INDEX `index_TreasureHunt_user_id` ON `${TABLE_NAME}` (`user_id`)"
           }
         ],
         "foreignKeys": [
@@ -358,7 +358,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"e5d90dd4daa7ef919e906e316aaa9d21\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"e639ded2cd81f623ca1c6f25e385d993\")"
     ]
   }
 }

@@ -14,7 +14,6 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
     private String uniqueID = null;
-    public static User user;
 
     private SharedPreferenceConfig preferenceConfig;
 

@@ -18,8 +18,11 @@ public interface UserDao {
     @Query("DELETE FROM User")
     public void nukeTable();
 
-    @Query("SELECT * FROM User WHERE username = :username")
+    @Query("SELECT * FROM User WHERE username == :username")
     User findUserByUsername(String username);
+
+    @Query(("SELECT id FROM User WHERE username == :username"))
+    int getUserID(String username);
 
     @Delete
     void deleteUser(User user);
