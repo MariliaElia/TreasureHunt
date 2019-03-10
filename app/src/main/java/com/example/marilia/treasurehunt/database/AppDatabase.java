@@ -14,6 +14,7 @@ import android.support.constraint.ConstraintLayout;
 public abstract class AppDatabase extends RoomDatabase {
     abstract public TreasureHuntDao treasureHuntDao();
     abstract public UserDao userDao();
+    abstract public ClueDao clueDao();
     abstract public PlayerDao playerDao();
 
     public static final Migration MIGRATION_1_2 = new Migration(1, 2) {
@@ -49,8 +50,22 @@ public abstract class AppDatabase extends RoomDatabase {
         }
     };
 
+    public static final Migration MIGRATION_5_6 = new Migration(5, 6) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE TreasureHunt "
+                    + " ADD COLUMN status STRING");
+        }
+    };
 
-
-
+    public static final Migration MIGRATION_6_7 = new Migration(6, 7) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE TreasureHunt "
+                    + " ADD COLUMN startTime DATE");
+            database.execSQL("ALTER TABLE TreasureHunt "
+                    + " ADD COLUMN endTime DATE");
+        }
+    };
 
 }

@@ -7,6 +7,8 @@
     <string name="title">Title</string>
     <string name="openDate">Select Open Date</string>
     <string name="closingDate">Select Close Date</string>
+    <string name="startTime">Start Time</string>
+    <string name="endTime">End Time</string>
     <string name="country">Country</string>
     <string name="city">City</string>
     <string name="description">Description</string>
@@ -24,9 +26,14 @@
     <string name="dob">Date of Birth</string>
     <string name="register">Register</string>
     <string name="logout">Logout</string>
+    <string name="createdByMe">T.H. Created by me</string>
+    <string name="participatedIn">T.H. Participated In</string>
 
     <string name="login_preference">com.example.marilia.treasurehunt_login_preference</string>
     <string name="login_status_preference">com.example.marilia.treasurehunt_login_status_preference</string>
     <string name="title_activity_maps">Map</string>
+    <string name="title_activity_clue_maps">Map</string>
+
+    <string name="cancel">Cancel</string>
 
 </resources>

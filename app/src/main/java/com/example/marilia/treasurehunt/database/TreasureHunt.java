@@ -29,20 +29,28 @@ public class TreasureHunt {
     @TypeConverters({Converters.class})
     public Date close_on;
 
+    public Date startTime;
+    public Date endTime;
+
     public String country;
     public String town;
 
     public int user_id;
 
-    public TreasureHunt(String title, String description, Date date_created, Date open_on, Date close_on, String country, String town, int user_id) {
+    public String status;
+
+    public TreasureHunt(String title, String description, Date date_created, Date open_on, Date startTime, Date endTime, Date close_on, String country, String town, int user_id, String status) {
         this.title = title;
         this.description = description;
         this.date_created = date_created;
         this.open_on = open_on;
+        this.startTime = startTime;
         this.close_on = close_on;
+        this.endTime = endTime;
         this.country = country;
         this.town = town;
         this.user_id = user_id;
+        this.status = status;
     }
 
     //Getters

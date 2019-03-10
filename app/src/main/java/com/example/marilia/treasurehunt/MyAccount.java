@@ -12,7 +12,7 @@ import com.example.marilia.treasurehunt.database.User;
 
 public class MyAccount  extends AppCompatActivity {
     private static final String TAG = "MyAccount";
-    Button logoutBn;
+    Button logoutBn, createdByMeBn, participatedInBn;
     TextView accountMessage;
     private SharedPreferenceConfig preferenceConfig;
 
@@ -22,6 +22,14 @@ public class MyAccount  extends AppCompatActivity {
         setContentView(R.layout.activity_my_account);
 
         preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
+
+        createdByMeBn = (Button) findViewById(R.id.createdByMe);
+        createdByMeBn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
 
         logoutBn = (Button) findViewById(R.id.logoutBn);
         accountMessage = (TextView) findViewById(R.id.accountMessage);

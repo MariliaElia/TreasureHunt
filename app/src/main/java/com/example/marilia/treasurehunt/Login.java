@@ -34,17 +34,25 @@ public class Login extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        /*preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
+
+        if(preferenceConfig.getLoginStatus()){
+            startActivity(new Intent(this, MainActivity.class));
+            finish();
+        }*/
+
+        appDatabase = Room.databaseBuilder(getApplicationContext(),
+                AppDatabase.class, "AppDatabase.db")
+                .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3, AppDatabase.MIGRATION_3_4, AppDatabase.MIGRATION_4_5, AppDatabase.MIGRATION_5_6,
+                        AppDatabase.MIGRATION_6_7)
+                .build();
+
         preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
 
         if(preferenceConfig.getLoginStatus()){
             startActivity(new Intent(this, MainActivity.class));
             finish();
         }
-
-        appDatabase = Room.databaseBuilder(getApplicationContext(),
-                AppDatabase.class, "AppDatabase.db")
-                .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3, AppDatabase.MIGRATION_3_4, AppDatabase.MIGRATION_4_5)
-                .build();
 
         usernameText = (EditText) findViewById(R.id.username);
         passwordText = (EditText) findViewById(R.id.password);
