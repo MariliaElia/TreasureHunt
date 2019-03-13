@@ -29,7 +29,9 @@ public class TreasureHunt {
     @TypeConverters({Converters.class})
     public Date close_on;
 
+    @TypeConverters({Converters.class})
     public Date startTime;
+    @TypeConverters({Converters.class})
     public Date endTime;
 
     public String country;
@@ -39,7 +41,7 @@ public class TreasureHunt {
 
     public String status;
 
-    public TreasureHunt(String title, String description, Date date_created, Date open_on, Date startTime, Date endTime, Date close_on, String country, String town, int user_id, String status) {
+    public TreasureHunt(String title, String description, Date date_created, Date open_on, Date startTime, Date close_on, Date endTime, String country, String town, int user_id, String status) {
         this.title = title;
         this.description = description;
         this.date_created = date_created;

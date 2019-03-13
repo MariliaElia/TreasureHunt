@@ -8,21 +8,28 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.marilia.treasurehunt.database.Clue;
+import com.example.marilia.treasurehunt.database.TreasureHunt;
 
-public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
+public class CluesAdapter extends RecyclerView.Adapter<CluesAdapter.ViewHolder> {
     private Clue[] clues;
+    private TreasureHunt[] ths;
     private Context context;
 
-    public RecyclerViewAdapter(Clue[] clues) { this.clues = clues; }
+    public CluesAdapter(Clue[] clues) { this.clues = clues; }
 
-    public RecyclerViewAdapter(Context cont, ListClues[] clue) {
+    public CluesAdapter(Context cont, ListClues[] clue) {
         super();
         this.clues = clues;
         context = cont;
     }
+    public CluesAdapter(Context cont, TreasureHunt[] th) {
+        super();
+        this.ths = th;
+        context = cont;
+    }
 
     @Override
-    public RecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public CluesAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = (View) LayoutInflater.from(parent.getContext()).inflate(R.layout.list_clues,
                 parent, false);
         ViewHolder holder = new ViewHolder(v);

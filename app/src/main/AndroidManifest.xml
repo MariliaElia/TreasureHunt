@@ -61,6 +61,9 @@
         <activity
             android:name=".Register"
             android:label="@string/app_name" />
+        <activity
+            android:name=".MyTreasureHuntsActivity"
+            android:label="@string/app_name" />
 
         <uses-library
             android:name="org.apache.http.legacy"

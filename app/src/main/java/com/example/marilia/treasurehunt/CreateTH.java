@@ -120,6 +120,7 @@ public class CreateTH extends AppCompatActivity {
         //Get current user
         user = preferenceConfig.getUserLoggedIn();
         username = user.username;
+        long id = user.id;
 
         addCluesBn = (Button) findViewById(R.id.addClues);
            addCluesBn.setOnClickListener(new View.OnClickListener() {
@@ -182,9 +183,14 @@ public class CreateTH extends AppCompatActivity {
     private TimePickerDialog.OnTimeSetListener timeListener = new TimePickerDialog.OnTimeSetListener() {
         @Override
         public void onTimeSet(TimePicker view, int hour, int minutes) {
-            String time = hour + ":" + minutes;
+            String time;
+            if (String.valueOf(minutes).length() == 1 ){
+                time = hour + ":0" + minutes;
+            } else {
+                time = hour + ":" + minutes;
+            }
             activeTimeDisplay.setText(time);
-            if (activeDateDisplay == displayStartTime) {
+            if (activeTimeDisplay == displayStartTime) {
                 startTime = stringToTime(time);
             } else if (activeTimeDisplay == displayEndTime){
                 endTime = stringToTime(time);
@@ -260,6 +266,7 @@ public class CreateTH extends AppCompatActivity {
 
         return time;
     }
+
 
 }
 

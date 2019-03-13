@@ -1,13 +1,12 @@
 package com.example.marilia.treasurehunt;
 
-import android.content.AsyncTaskLoader;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -84,8 +83,10 @@ public class ListClues extends AppCompatActivity {
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-        rvAdapter = new RecyclerViewAdapter(clues);
+        rvAdapter = new CluesAdapter(clues);
         recyclerView.setAdapter(rvAdapter);
+        DividerItemDecoration mDividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), 1);
+        recyclerView.addItemDecoration(mDividerItemDecoration);
     }
 
     private class UpdateDatabaseTask extends AsyncTask<Void, Void, Void> {

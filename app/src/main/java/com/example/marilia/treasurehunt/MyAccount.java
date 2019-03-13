@@ -27,7 +27,7 @@ public class MyAccount  extends AppCompatActivity {
         createdByMeBn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                startActivity(new Intent(MyAccount.this, MyTreasureHuntsActivity.class));
             }
         });
 

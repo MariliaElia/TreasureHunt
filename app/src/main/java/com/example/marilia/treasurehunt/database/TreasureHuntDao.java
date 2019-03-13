@@ -19,6 +19,9 @@ public interface TreasureHuntDao {
     @Query("SELECT * FROM treasurehunt WHERE country = :country")
     public TreasureHunt[] loadAllTreasureHuntsInCountry(String country);
 
+    @Query("SELECT * FROM treasurehunt WHERE user_id = :user_id")
+    public TreasureHunt[] loadAllTreasureHuntsCreatedBy(int user_id);
+
     //Update status of a treasure hunt
     @Query("UPDATE treasurehunt SET status = :status WHERE id = :thID")
     public void updateTreasureHuntStatus(String status, int thID);

@@ -1,13 +1,15 @@
 package com.example.marilia.treasurehunt;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.marilia.treasurehunt.database.Clue;
 import com.google.android.gms.maps.GoogleMap;
@@ -99,6 +101,42 @@ public class ClueMapsActivity extends FragmentActivity implements OnMapReadyCall
             Login.appDatabase.clueDao().insertClue(cl);
             return null;
         }
+    }
+
+    private class DeleteFromDatabaseTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            Login.appDatabase.treasureHuntDao().deleteTreasureHunt(thID);
+            return null;
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Leave page");
+        builder.setMessage("Leaving the page will delete all data for the Treasure Hunt.");
+        builder.setPositiveButton("Stay", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                stayInClueMapsActivity();
+            }
+        });
+        builder.setNegativeButton("Exit", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                ClueMapsActivity.super.onBackPressed();
+                Toast.makeText(ClueMapsActivity.this,"Creating Treasure Hunt cancelled.", Toast.LENGTH_SHORT).show();
+                new DeleteFromDatabaseTask().execute();
+                finish();
+            }
+        });
+        builder.show();
+    }
+
+    private void stayInClueMapsActivity(){
+        Intent intent = new Intent(ClueMapsActivity.this, ClueMapsActivity.class);
+        intent.putExtra("THID", (int) thID);
+        startActivity(intent);
+        finish();
     }
 
 }

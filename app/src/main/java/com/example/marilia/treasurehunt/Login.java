@@ -82,14 +82,9 @@ public class Login extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            Log.d(TAG, "Searching Database");
             user = appDatabase.userDao().findUserByUsername(username);
-            Log.d(TAG, user.username.toString());
-            Log.d(TAG, "Input password:" + password);
-            Log.d(TAG, "Database password: "+ user.password);
             if (user != null) {
                 if (password.equals(user.getPassword())) {
-                    Log.d(TAG, "I AM IN");
                     startActivity(new Intent(getApplicationContext(), MainActivity.class));
                     preferenceConfig.setLoginStatus(true);
                     preferenceConfig.storeUserData(user);
