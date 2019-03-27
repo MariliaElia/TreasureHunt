@@ -55,7 +55,6 @@ public class MyTreasureHuntsActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-
             displayTreasureHunts();
         }
     }

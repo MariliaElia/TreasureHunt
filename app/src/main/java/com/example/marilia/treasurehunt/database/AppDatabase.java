@@ -9,7 +9,7 @@ import android.arch.persistence.room.migration.Migration;
 import android.content.Context;
 import android.support.constraint.ConstraintLayout;
 
-@Database(entities = {User.class, TreasureHunt.class, Clue.class, Player.class}, version = 2 )
+@Database(entities = {User.class, TreasureHunt.class, Clue.class, Player.class}, version = 3 )
 @TypeConverters(Converters.class)
 public abstract class AppDatabase extends RoomDatabase {
     abstract public TreasureHuntDao treasureHuntDao();

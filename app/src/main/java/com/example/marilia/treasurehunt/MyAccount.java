@@ -28,6 +28,7 @@ public class MyAccount  extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MyAccount.this, MyTreasureHuntsActivity.class));
+                finish();
             }
         });
 
@@ -43,8 +44,9 @@ public class MyAccount  extends AppCompatActivity {
             public void onClick(View v) {
                 preferenceConfig.clearUserData();
                 preferenceConfig.setLoginStatus(false);
-                startActivity(new Intent(v.getContext(), Login.class));
-                finish();
+                Intent intent = new Intent(getApplicationContext(), Login.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
             }
         });
     }

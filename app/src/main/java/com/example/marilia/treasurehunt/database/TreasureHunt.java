@@ -5,6 +5,8 @@ import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import java.util.Date;
 
@@ -16,7 +18,7 @@ import static android.arch.persistence.room.ForeignKey.CASCADE;
                 parentColumns = "id",
                 childColumns = "user_id",
                 onDelete = CASCADE))
-public class TreasureHunt {
+public class TreasureHunt implements Parcelable {
     @PrimaryKey(autoGenerate = true) int id;
 
     public String title;
@@ -53,6 +55,55 @@ public class TreasureHunt {
         this.town = town;
         this.user_id = user_id;
         this.status = status;
+    }
+
+    /* PARCELABLE */
+    protected TreasureHunt(Parcel in) {
+        id = in.readInt();
+        title = in.readString();
+        description = in.readString();
+        country = in.readString();
+        town = in.readString();
+        user_id = in.readInt();
+        status = in.readString();
+        open_on = new Date (in.readLong());
+        startTime = new Date (in.readLong());
+        close_on = new Date (in.readLong());
+        endTime = new Date (in.readLong());
+
+    }
+
+    public static final Creator<TreasureHunt> CREATOR = new Creator<TreasureHunt>() {
+        @Override
+        public TreasureHunt createFromParcel(Parcel in) {
+            return new TreasureHunt(in);
+        }
+
+        @Override
+        public TreasureHunt[] newArray(int size) {
+            return new TreasureHunt[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(title);
+        dest.writeString(description);
+        dest.writeString(country);
+        dest.writeString(town);
+        dest.writeInt(user_id);
+        dest.writeString(status);
+        dest.writeLong(open_on.getTime());
+        dest.writeLong(startTime.getTime());
+        dest.writeLong(close_on.getTime());
+        dest.writeLong(endTime.getTime());
+
     }
 
     //Getters

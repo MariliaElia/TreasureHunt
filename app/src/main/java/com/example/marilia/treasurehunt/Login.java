@@ -74,6 +74,7 @@ public class Login extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(v.getContext(), Register.class));
+                finish();
             }
         });
     }
@@ -83,20 +84,31 @@ public class Login extends AppCompatActivity {
         @Override
         protected Void doInBackground(Void... voids) {
             user = appDatabase.userDao().findUserByUsername(username);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
             if (user != null) {
                 if (password.equals(user.getPassword())) {
                     startActivity(new Intent(getApplicationContext(), MainActivity.class));
                     preferenceConfig.setLoginStatus(true);
                     preferenceConfig.storeUserData(user);
                     finish();
+                } else {
+                    Toast toast = Toast.makeText(Login.this,
+                            "Wrong Password.",
+                            Toast.LENGTH_SHORT);
+                    toast.show();
                 }
             }else{
-                Toast toast = Toast.makeText(getApplicationContext(),
+                Toast toast = Toast.makeText(Login.this,
                         "User does not exist. Please register.",
                         Toast.LENGTH_SHORT);
                 toast.show();
             }
-            return null;
         }
     }
 

@@ -30,7 +30,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-public class CreateTH extends AppCompatActivity {
+public class  CreateTH extends AppCompatActivity {
     private static final String TAG = "CreateTH";
 
     private TextView displayOpenDate;

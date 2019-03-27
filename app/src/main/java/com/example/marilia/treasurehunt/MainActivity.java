@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
                         intent = new Intent(v.getContext(), CreateTH.class);
                         break;
                     case 2:
-                        intent = new Intent(v.getContext(), CreateTH.class);
+                        intent = new Intent(v.getContext(), FindTreasureHunts.class);
                         break;
                     case 3:
                         intent = new Intent(v.getContext(), MyAccount.class);
