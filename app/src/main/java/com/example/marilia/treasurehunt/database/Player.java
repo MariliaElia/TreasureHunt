@@ -10,7 +10,7 @@ import java.util.Date;
 
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
-@Entity(indices = @Index("th_id"), foreignKeys ={@ForeignKey(entity = TreasureHunt.class,
+@Entity(indices = {@Index("th_id"), @Index("user_id")}, foreignKeys ={@ForeignKey(entity = TreasureHunt.class,
         parentColumns = "id",
         childColumns = "th_id",
         onDelete=CASCADE),@ForeignKey(entity = User.class,

@@ -1,71 +1,62 @@
 package com.example.marilia.treasurehunt;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.PermissionChecker;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.marilia.treasurehunt.R;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
+import com.example.marilia.treasurehunt.database.Clue;
+import com.example.marilia.treasurehunt.database.PlayerClue;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.nabinbhandari.android.permissions.PermissionHandler;
-import com.nabinbhandari.android.permissions.Permissions;
 
-import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-
-import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 public class GameActivity extends FragmentActivity implements OnMapReadyCallback {
     private static final String TAG = "GameActivity";
     private static final int REQUEST_CODE = 1000;
     public static final float DEFAULT_ZOOM = 15f;
+    public static final String STATUS_COMPLETED = "completed";
+    public static final String STATUS_PENDING = "pending";
+    public static final int CLUE_REWARD = 1;
+    public static final int POINTS_REWARD = 10;
 
     private GoogleMap mMap;
     Button btn_here;
 
-    private SupportMapFragment mapFragment;
     private FusedLocationProviderClient fusedLocationProviderClient;
     private LocationRequest locationRequest;
     LocationCallback locationCallback;
     private Boolean locationPermissionGranted = false;
+
+    private SharedPreferenceConfig preferenceConfig;
+
     private Location currentLocation;
+    private int thID, userID, lastClueID;
+    private Clue cl;
+    private double lonClue, latClue;
+    private double currentLon, currentLat;
+    private Date currentDate;
+    private TextView clue;
 
 
     @Override
@@ -73,43 +64,205 @@ public class GameActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        //Map
-        mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        Intent intent = getIntent();
+        thID = intent.getIntExtra("treasureHuntID", -1);
+
+        preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
+        userID = preferenceConfig.getUserID();
+
+        new FindClueIDTask().execute();
 
         //Check Permissions
-        String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION};
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-            ActivityCompat.requestPermissions(this, permissions, REQUEST_CODE);
-        } else {
-            Log.d(TAG, "Permissions granted");
-            //permission granted
-            buildLocationRequest();
-            buildLocationCallback();
-            locationPermissionGranted = true;
-            //Create FusedProviderClient
-            fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
-
-            //Start Location Updates
-            Log.d(TAG, "Location updates requested");
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                    && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                return;
-            }
-            fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
-        }
+        getLocationPermission();
 
         btn_here = (Button) findViewById(R.id.here);
         btn_here.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Get lon lat for this clue
+                //Check if user is in that location
+                //If correct
+                //   make playerClue status from pending to completed
+                //   add one to noOfSuccessfulClues
+                //   add points to Player
+                //Else
+                //   user is in the wrong location, display message
 
+                if (locationPermissionGranted) {
+                    currentLat = currentLocation.getLatitude();
+                    currentLon = currentLocation.getLongitude();
+
+                    boolean checkLonLat = checkLonLat(currentLat, currentLon, lonClue,latClue);
+
+                    if (checkLonLat) {
+                        //updatePlayerClue status
+                        new UpdatePlayerTHValuesTask().execute();
+                        new UpdatePlayerClueStatusTask().execute();
+
+                    } else {
+                        Toast.makeText(getApplicationContext(),"Oops! Looks like this isn't the correct location!",Toast.LENGTH_LONG).show();
+                    }
+                }
             }
         });
 
+        //For button skipped
+        //make playerClue status skipped
+        //decrease points of user from initial table
     }
 
+    public void callGameActivity() {
+        Intent intent = new Intent(GameActivity.this, GameActivity.class);
+        intent.putExtra("treasureHuntID", thID);
+        startActivity(intent);
+        finish();
+    }
+
+    private boolean checkLonLat(double currentLat, double currentLon, double lonClue, double latClue) {
+        double meters = 15;
+
+        // number of km per degree = 111.32 in google maps
+        // 1km in degree
+        double kmInDegree = 1 / 111.32;
+        // 1m in degree
+        double mInDegree = kmInDegree /1000;
+
+        double offset = meters * mInDegree;
+
+        double newPosLat = latClue + offset;
+        double newNegLat = latClue - offset;
+
+        //degrees to radians
+        double radians = Math.PI / 180;
+
+        double newPosLon = lonClue + (offset / Math.cos(latClue*radians));
+        double newNegLon = lonClue + (-offset / Math.cos(latClue*radians));
+
+        if ((currentLat<newPosLat && currentLat>newNegLat) && (currentLon>newNegLon && currentLon<newPosLon)){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /** DATABASE CALLS **/
+
+    private class UpdatePlayerClueStatusTask extends  AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            Login.appDatabase.playerClueDao().updatePlayerClueStatus(STATUS_COMPLETED, thID, userID, lastClueID);
+            cl = Login.appDatabase.clueDao().loadClue(thID, lastClueID + 1);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (cl != null) {
+                new CreatePlayerClueTask().execute();
+            } else {
+                new UpdateTreasureHuntStatusTask().execute();
+            }
+        }
+    }
+
+    private class UpdateTreasureHuntStatusTask extends  AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            currentDate = new Date();
+            Login.appDatabase.playerDao().updatePlayerTHStatus(thID, userID, STATUS_COMPLETED, currentDate, currentDate);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            Toast.makeText(getApplicationContext(),"Congratulations!! You finished the Treasure Hunt", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private class CreatePlayerClueTask extends  AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            PlayerClue playerClue = new PlayerClue(thID, userID, lastClueID + 1, STATUS_PENDING);
+            Login.appDatabase.playerClueDao().insertPlayerClue(playerClue);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            callGameActivity();
+        }
+    }
+
+    private class UpdatePlayerTHValuesTask extends  AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            Login.appDatabase.playerDao().updatePlayerTHValues(CLUE_REWARD, POINTS_REWARD, thID, userID, STATUS_PENDING);
+            return null;
+        }
+    }
+
+    /**
+     * FindCluIDTask finds the last clue id the player has stopped playing at
+     */
+    private class FindClueIDTask extends  AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            lastClueID = Login.appDatabase.playerClueDao().getLastClueID(thID,userID,"pending");
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            new FindClueTask().execute();
+        }
+    }
+
+    /**
+     * Finds the clue from the TreasureHunt table by using the clueID from last AsyncTask
+     */
+    private class FindClueTask extends  AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            cl = Login.appDatabase.clueDao().loadClue(thID, lastClueID);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            displayClue();
+        }
+    }
+
+    /**
+     * Displays the clue found in TreasureHunt table
+     */
+    private void displayClue() {
+        clue = findViewById(R.id.clue);
+        clue.setText(cl.clue);
+        lonClue = cl.longitude;
+        latClue = cl.latitude;
+
+    }
+
+    /**
+     * Initializes map
+     */
+    public void initMap() {
+        Log.d(TAG, "initMap: initialize map");
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+    }
+
+    /**
+     * when map is ready, sets the location
+     * @param googleMap
+     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -123,15 +276,48 @@ public class GameActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    /**
+     * When the activity is no longer visible stops location updates
+     */
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onStop() {
+        super.onStop();
 
-        //Stop Location Updates
-        fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+        //if the location permissions were granted
+        if (locationPermissionGranted) {
+            //Stop Location Updates
+            fusedLocationProviderClient.removeLocationUpdates(locationCallback);
+            Log.d(TAG, "Stop Location Updates");
+        }
 
     }
 
+    /**
+     * Asks for location permissions
+     */
+    public void getLocationPermission() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
+        } else {
+            Log.d(TAG, "Permissions granted");
+            initMap();
+            //permission granted
+            buildLocationRequest();
+            buildLocationCallback();
+            locationPermissionGranted = true;
+
+            //Create FusedProviderClient
+            fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+            //Start Location Updates
+            startLocationUpdates();
+
+        }
+    }
+
+    /**
+     * Builds location request
+     */
     private void buildLocationRequest() {
         locationRequest = new LocationRequest();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -140,25 +326,40 @@ public class GameActivity extends FragmentActivity implements OnMapReadyCallback
         locationRequest.setSmallestDisplacement(10);
     }
 
+    /**
+     * Requests location updates
+     */
+    private void startLocationUpdates() {
+        Log.d(TAG, "Location updates requested");
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
+    }
+
+    /**
+     * Build location callback
+     */
     private void buildLocationCallback() {
         locationCallback = new LocationCallback(){
             @Override
             public void onLocationResult(LocationResult locationResult) {
-                Log.d(TAG, "Location Results: " + locationResult.getLocations().toString());
-
                 for(Location location:locationResult.getLocations()){
                     if (locationPermissionGranted && mMap!=null) {
                         moveCamera(new LatLng(location.getLatitude(), location.getLongitude()), DEFAULT_ZOOM);
                         currentLocation = location;
                     }
-                    Log.d(TAG, String.valueOf(location.getLatitude()) +
-                            "/" +
-                            String.valueOf(location.getLongitude()));
                 }
             }
         };
     }
 
+    /**
+     * Moves camera of the map to the user location
+     * @param latLng
+     * @param zoom
+     */
     private void moveCamera(LatLng latLng, float zoom) {
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
     }
@@ -168,9 +369,28 @@ public class GameActivity extends FragmentActivity implements OnMapReadyCallback
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch(requestCode) {
             case REQUEST_CODE:
-                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d(TAG, "onRequestPermissionResult: persmission succeeded");
-                    locationPermissionGranted = true;
+                if(grantResults.length > 0) {
+                    if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        initMap();
+                        Log.d(TAG, "onRequestPermissionResult: persmission succeeded");
+                        locationPermissionGranted = true;
+                        buildLocationRequest();
+                        buildLocationCallback();
+
+                        //Create FusedProviderClient
+                        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
+
+                        //Start Location Updates
+                        startLocationUpdates();
+                    }
+                }else if (grantResults[0] == PackageManager.PERMISSION_DENIED){
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                        Toast toast = Toast.makeText(getApplicationContext(), "Turn on location permissions from Settings to continue!", Toast.LENGTH_SHORT);
+                        toast.show();
+                    } else {
+                        Toast toast = Toast.makeText(getApplicationContext(), "Turn on location permissions from Settings to continue!", Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
                 }
         }
 

@@ -9,13 +9,14 @@ import android.arch.persistence.room.migration.Migration;
 import android.content.Context;
 import android.support.constraint.ConstraintLayout;
 
-@Database(entities = {User.class, TreasureHunt.class, Clue.class, Player.class}, version = 3 )
+@Database(entities = {User.class, TreasureHunt.class, Clue.class, Player.class, PlayerClue.class}, version = 3 )
 @TypeConverters(Converters.class)
 public abstract class AppDatabase extends RoomDatabase {
     abstract public TreasureHuntDao treasureHuntDao();
     abstract public UserDao userDao();
     abstract public ClueDao clueDao();
     abstract public PlayerDao playerDao();
+    abstract public PlayerClueDao playerClueDao();
 
     public static final Migration MIGRATION_1_2 = new Migration(1, 2) {
         @Override

@@ -120,14 +120,13 @@ public class  CreateTH extends AppCompatActivity {
         //Get current user
         user = preferenceConfig.getUserLoggedIn();
         username = user.username;
-        long id = user.id;
 
         addCluesBn = (Button) findViewById(R.id.addClues);
            addCluesBn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     //Find id of current user
-                    new SearchDatabaseTask().execute();
+                    userID = preferenceConfig.getUserID();
 
                     //Get information user has input
                     title = titleText.getText().toString();
@@ -161,16 +160,7 @@ public class  CreateTH extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-
             callClueMapsActivity();
-        }
-    }
-
-    private class SearchDatabaseTask extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... voids) {
-            userID = Login.appDatabase.userDao().getUserID(username);
-            return null;
         }
     }
 

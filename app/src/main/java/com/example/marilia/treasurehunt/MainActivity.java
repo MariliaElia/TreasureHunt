@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
+        User user = preferenceConfig.getUserLoggedIn();
 
         final GridView gridview = (GridView) findViewById(R.id.gridview);
         //setAdapter sets a custom adapter as source for all items displayed in grid

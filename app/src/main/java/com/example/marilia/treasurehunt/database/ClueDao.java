@@ -11,4 +11,11 @@ public interface ClueDao {
 
     @Query("SELECT * FROM clue WHERE th_id == :thID")
     public Clue[] loadAllCluesforTH(int thID);
+
+    @Query("SELECT id FROM clue WHERE th_id == :thID ORDER BY id LIMIT 1 OFFSET 0")
+    public int loadFistClueID(int thID);
+
+    @Query("SELECT * FROM clue WHERE th_id == :thID AND id == :clueID")
+    public Clue loadClue(int thID, int clueID);
+
 }

@@ -13,7 +13,7 @@ import java.util.Date;
 import static android.arch.persistence.room.ForeignKey.CASCADE;
 
 
-@Entity(indices = @Index(value = "id", unique = true),
+@Entity(indices = {@Index(value = "id", unique = true), @Index(value = "user_id")},
         foreignKeys = @ForeignKey(entity = User.class,
                 parentColumns = "id",
                 childColumns = "user_id",
