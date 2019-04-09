@@ -1,6 +1,8 @@
 package com.example.marilia.treasurehunt;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -37,11 +39,13 @@ public class GameActivity extends FragmentActivity implements OnMapReadyCallback
     public static final float DEFAULT_ZOOM = 15f;
     public static final String STATUS_COMPLETED = "completed";
     public static final String STATUS_PENDING = "pending";
+    public static final String STATUS_SKIPPED = "skipped";
     public static final int CLUE_REWARD = 1;
     public static final int POINTS_REWARD = 10;
+    public static final int POINTS_SKIP = -10;
 
     private GoogleMap mMap;
-    Button btn_here;
+    Button btn_here, skip;
 
     private FusedLocationProviderClient fusedLocationProviderClient;
     private LocationRequest locationRequest;
@@ -57,7 +61,6 @@ public class GameActivity extends FragmentActivity implements OnMapReadyCallback
     private double currentLon, currentLat;
     private Date currentDate;
     private TextView clue;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,6 +109,26 @@ public class GameActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+        skip = (Button) findViewById(R.id.skip);
+        skip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(GameActivity.this);
+                builder.setTitle("Skip Clue");
+                builder.setMessage("Skipping this clue you will lose 10 points!");
+                builder.setPositiveButton("Stay", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                    }
+                });
+                builder.setNegativeButton("Skip", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        new UpdatesSkipStatusTask().execute();
+                    }
+                });
+                builder.show();
+            }
+        });
+
         //For button skipped
         //make playerClue status skipped
         //decrease points of user from initial table
@@ -119,7 +142,7 @@ public class GameActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private boolean checkLonLat(double currentLat, double currentLon, double lonClue, double latClue) {
-        double meters = 15;
+        double meters = 17;
 
         // number of km per degree = 111.32 in google maps
         // 1km in degree
@@ -147,6 +170,31 @@ public class GameActivity extends FragmentActivity implements OnMapReadyCallback
 
     /** DATABASE CALLS **/
 
+    private class UpdatesSkipStatusTask extends  AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            //Decrease points from the user
+            Login.appDatabase.userDao().updateUserPoints(POINTS_SKIP, userID);
+            //Make status skipped
+            Login.appDatabase.playerClueDao().updatePlayerClueStatus(STATUS_SKIPPED, thID, userID, lastClueID);
+            //check if remaining clues for this treasure hunt
+            cl = Login.appDatabase.clueDao().loadClue(thID, lastClueID + 1);
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (cl != null) {
+                new CreatePlayerClueTask().execute();
+            } else {
+                //Player has finished the treasure hunt
+                new UpdateTreasureHuntStatusTask().execute();
+            }
+        }
+    }
+
     private class UpdatePlayerClueStatusTask extends  AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
@@ -161,6 +209,7 @@ public class GameActivity extends FragmentActivity implements OnMapReadyCallback
             if (cl != null) {
                 new CreatePlayerClueTask().execute();
             } else {
+                //Player has finished the treasure hunt
                 new UpdateTreasureHuntStatusTask().execute();
             }
         }
@@ -170,14 +219,16 @@ public class GameActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         protected Void doInBackground(Void... voids) {
             currentDate = new Date();
-            Login.appDatabase.playerDao().updatePlayerTHStatus(thID, userID, STATUS_COMPLETED, currentDate, currentDate);
+            Login.appDatabase.playerDao().updatePlayerTHStatus(thID, userID,STATUS_PENDING, STATUS_COMPLETED, currentDate, currentDate);
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            Toast.makeText(getApplicationContext(),"Congratulations!! You finished the Treasure Hunt", Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(GameActivity.this, FinishedActivity.class);
+            startActivity(intent);
+            finish();
         }
     }
 
@@ -199,6 +250,7 @@ public class GameActivity extends FragmentActivity implements OnMapReadyCallback
     private class UpdatePlayerTHValuesTask extends  AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
+            Login.appDatabase.userDao().updateUserPoints(POINTS_REWARD, userID);
             Login.appDatabase.playerDao().updatePlayerTHValues(CLUE_REWARD, POINTS_REWARD, thID, userID, STATUS_PENDING);
             return null;
         }

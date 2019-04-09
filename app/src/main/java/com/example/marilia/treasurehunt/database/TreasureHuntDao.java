@@ -10,17 +10,14 @@ public interface TreasureHuntDao {
     @Insert
     public long insertTreasureHunt(TreasureHunt treasureHunt);
 
-    @Query("SELECT * FROM treasurehunt")
-    public TreasureHunt[] loadAllTreasureHunts();
-
     @Query("SELECT * FROM treasurehunt WHERE town = :town")
     public TreasureHunt[] loadAllTreasureHuntsInTown(String town);
 
-    @Query("SELECT * FROM treasurehunt WHERE country = :country")
-    public TreasureHunt[] loadAllTreasureHuntsInCountry(String country);
-
     @Query("SELECT * FROM treasurehunt WHERE user_id = :user_id")
     public TreasureHunt[] loadAllTreasureHuntsCreatedBy(int user_id);
+
+    @Query("SELECT * FROM treasurehunt WHERE id IN (:thIDs)")
+    public TreasureHunt[] loadAllTreasureHuntsWith(int[] thIDs);
 
     //Update status of a treasure hunt
     @Query("UPDATE treasurehunt SET status = :status WHERE id = :thID")

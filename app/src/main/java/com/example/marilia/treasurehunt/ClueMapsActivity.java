@@ -118,7 +118,6 @@ public class ClueMapsActivity extends FragmentActivity implements OnMapReadyCall
         builder.setMessage("Leaving the page will delete all data for the Treasure Hunt.");
         builder.setPositiveButton("Stay", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                stayInClueMapsActivity();
             }
         });
         builder.setNegativeButton("Exit", new DialogInterface.OnClickListener() {
@@ -130,13 +129,6 @@ public class ClueMapsActivity extends FragmentActivity implements OnMapReadyCall
             }
         });
         builder.show();
-    }
-
-    private void stayInClueMapsActivity(){
-        Intent intent = new Intent(ClueMapsActivity.this, ClueMapsActivity.class);
-        intent.putExtra("THID", (int) thID);
-        startActivity(intent);
-        finish();
     }
 
 }

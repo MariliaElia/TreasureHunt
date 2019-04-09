@@ -14,7 +14,7 @@
         android:id="@+id/clue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="17dp" />
+        android:textSize="17sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -25,13 +25,13 @@
             android:id="@+id/skip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Skip" />
+            android:text="@string/skip" />
 
         <Button
             android:id="@+id/here"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="I am here!" />
+            android:text="@string/here" />
     </LinearLayout>
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"

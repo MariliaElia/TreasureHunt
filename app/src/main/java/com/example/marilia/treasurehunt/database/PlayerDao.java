@@ -18,11 +18,14 @@ public interface PlayerDao {
     @Query("SELECT id FROM Player WHERE user_id == :userID AND th_id == :thID AND status == :status")
     public int getPlayerID(int userID, int thID, String status);
 
-    @Query("UPDATE Player SET successful_clues =+ :clueReward, total_points =+ :pointReward WHERE th_id = :thID AND user_id = :userID " +
+    @Query("SELECT th_id FROM Player WHERE user_id == :user_id AND status == :status")
+    public int[] getTreasureHuntIDs(int user_id, String status);
+
+    @Query("UPDATE Player SET successful_clues = successful_clues+:clueReward, total_points = total_points+:pointReward WHERE th_id = :thID AND user_id = :userID " +
             "AND status == :status")
     public void updatePlayerTHValues(int clueReward, int pointReward, int thID, int userID, String status);
 
-    @Query("UPDATE Player SET status = :status, end_date = :endDate, end_time = :endTime WHERE th_id = :thID AND user_id = :userID " +
-            "AND status == :status")
-    public void updatePlayerTHStatus(int thID, int userID, String status, Date endDate, Date endTime);
+    @Query("UPDATE Player SET status = :statusCompleted, end_date = :endDate, end_time = :endTime WHERE th_id = :thID AND user_id = :userID " +
+            "AND status == :statusPending")
+    public void updatePlayerTHStatus(int thID, int userID,String statusPending, String statusCompleted, Date endDate, Date endTime);
 }

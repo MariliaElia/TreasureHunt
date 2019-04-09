@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
                 switch (position)
                 {
                     case 0:
-                        intent = new Intent(v.getContext(), CreateTH.class);
+                        intent = new Intent(v.getContext(), StartedActivity.class);
                         break;
                     case 1:
                         intent = new Intent(v.getContext(), CreateTH.class);

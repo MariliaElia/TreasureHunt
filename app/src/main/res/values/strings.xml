@@ -37,5 +37,10 @@
     <string name="cancel">Cancel</string>
     <string name="search">Search</string>
     <string name="title_activity_game">Map</string>
+    <string name="title_activity_started">StartedActivity</string>
+    <string name="here">I am Here!</string>
+    <string name="skip">Skip(-10)</string>
+    <string name="startedTH">Started Treasure Hunts</string>
+    <string name="play">Play Treasure Hunt</string>
 
 </resources>

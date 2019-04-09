@@ -24,6 +24,9 @@ public interface UserDao {
     @Query(("SELECT id FROM User WHERE username == :username"))
     int getUserID(String username);
 
+    @Query("UPDATE User SET points = points+:points WHERE id = :userID ")
+    public void updateUserPoints(int points, int userID);
+
     @Delete
     void deleteUser(User user);
 
