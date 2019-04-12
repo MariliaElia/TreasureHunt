@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -20,14 +21,21 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class ClueMapsActivity extends FragmentActivity implements OnMapReadyCallback {
+/**
+ * ClueMapsActivity class is the activity that displays the map and allows the user to associate a
+ * clue with a location clicked on the map
+ */
+public class ClueMapsActivity extends AppCompatActivity implements OnMapReadyCallback {
     private static final String TAG = "ClueMapsActivity";
+
+    //Google Maps
     private GoogleMap mMap;
     private Marker marker;
+
     public EditText clueText, descriptionText;
+    private double longitude, latitude;
     public String clue, description;
     private Button addClue;
-    private double longitude, latitude;
     public int thID = 0;
 
     @Override
@@ -35,29 +43,44 @@ public class ClueMapsActivity extends FragmentActivity implements OnMapReadyCall
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_clue_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().
+                findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        //Get the treasure hunt ID just created in previous activity
         Intent intent = getIntent();
         thID = intent.getIntExtra("THID", -1);
 
+        //EditTexts in activity
         clueText = (EditText) findViewById(R.id.clue);
         descriptionText = (EditText) findViewById(R.id.description);
         addClue = (Button) findViewById(R.id.addClue);
 
+        //Add Clue clicked
         addClue.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 clue = clueText.getText().toString();
                 description = descriptionText.getText().toString();
 
-                new InsertIntoDatabaseTask().execute();
+                if (clue.isEmpty() && latitude == 0 && longitude == 0) {
+                    //If null display message to user
+                    Toast toast = Toast.makeText(ClueMapsActivity.this,
+                            "You have to fill in the fields and select a position on the map to continue!",
+                            Toast.LENGTH_SHORT);
+                    toast.show();
+                } else {
+                    //Add the data from the editTexts in the database
+                    new InsertIntoDatabaseTask().execute();
 
-                Intent intent = new Intent(ClueMapsActivity.this, ListClues.class);
-                intent.putExtra("THID", (int) thID);
-                startActivity(intent);
-                finish();
+                    //Start the List Clues activity and pass the treasure hunt ID
+                    Intent intent = new Intent(ClueMapsActivity.this, ListClues.class);
+                    intent.putExtra("THID", (int) thID);
+                    startActivity(intent);
+
+                    //finish this activity
+                    finish();
+                }
             }
 
         });
@@ -66,19 +89,15 @@ public class ClueMapsActivity extends FragmentActivity implements OnMapReadyCall
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+        //get the position where the user clicks on the map
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
-            public void onMapLongClick(LatLng latLng) {
+            public void onMapClick(LatLng latLng) {
                 //User can only add one marker on the map
                 if (marker != null){
                     marker.setPosition(latLng);
@@ -93,7 +112,9 @@ public class ClueMapsActivity extends FragmentActivity implements OnMapReadyCall
         });
     }
 
-    /** Database **/
+    /**
+     * Creates a Clue object and adds it to the database
+     */
     private class InsertIntoDatabaseTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
@@ -103,6 +124,9 @@ public class ClueMapsActivity extends FragmentActivity implements OnMapReadyCall
         }
     }
 
+    /**
+     * Deletes the treasure hunt created by the user
+     */
     private class DeleteFromDatabaseTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
@@ -111,6 +135,11 @@ public class ClueMapsActivity extends FragmentActivity implements OnMapReadyCall
         }
     }
 
+    /**
+     * If the user pressed the back button, display an alert giving the user the choice to stay
+     * or leave, letting them know that the data inserted for the treasure hunt so far,
+     * will get deleted if they leave
+     */
     @Override
     public void onBackPressed() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);

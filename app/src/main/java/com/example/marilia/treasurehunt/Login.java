@@ -17,6 +17,9 @@ import com.example.marilia.treasurehunt.database.AppDatabase;
 import com.example.marilia.treasurehunt.database.TreasureHunt;
 import com.example.marilia.treasurehunt.database.User;
 
+/**
+ * Login class, authenticates the user by calling the database
+ */
 public class Login extends AppCompatActivity {
     private SharedPreferenceConfig preferenceConfig;
     private static final String TAG = "Login";
@@ -93,7 +96,7 @@ public class Login extends AppCompatActivity {
         }
 
         /**
-         * This method is called after the database searc has finished
+         * This method is called after the database search has finished
          * @param aVoid
          */
         @Override

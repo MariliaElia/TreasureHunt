@@ -17,17 +17,6 @@ public class CluesAdapter extends RecyclerView.Adapter<CluesAdapter.ViewHolder> 
 
     public CluesAdapter(Clue[] clues) { this.clues = clues; }
 
-    public CluesAdapter(Context cont, ListClues[] clue) {
-        super();
-        this.clues = clues;
-        context = cont;
-    }
-    public CluesAdapter(Context cont, TreasureHunt[] th) {
-        super();
-        this.ths = th;
-        context = cont;
-    }
-
     @Override
     public CluesAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = (View) LayoutInflater.from(parent.getContext()).inflate(R.layout.list_clues,
@@ -41,8 +30,6 @@ public class CluesAdapter extends RecyclerView.Adapter<CluesAdapter.ViewHolder> 
         if (holder!=null && clues[position]!=null) {
             holder.clue.setText(clues[position].clue);
             holder.description.setText(clues[position].description);
-            holder.longitude.setText(Double.toString(clues[position].longitude));
-            holder.latitude.setText(Double.toString(clues[position].latitude));
         }
     }
 
@@ -54,15 +41,11 @@ public class CluesAdapter extends RecyclerView.Adapter<CluesAdapter.ViewHolder> 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView clue;
         TextView description;
-        TextView longitude;
-        TextView latitude;
 
         public ViewHolder(View textView){
             super(textView);
             clue = (TextView) textView.findViewById(R.id.clue);
             description = (TextView) textView.findViewById(R.id.description);
-            longitude = (TextView) textView.findViewById(R.id.longitude);
-            latitude = (TextView) textView.findViewById(R.id.latitude);
         }
 
     }

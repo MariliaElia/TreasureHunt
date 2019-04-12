@@ -13,10 +13,10 @@ public class GridAdapter extends BaseAdapter {
 
     // references to images
     private Integer[] imageIds = {
-            R.drawable.gps,
-            R.drawable.edit,
-            R.drawable.loupe,
-            R.drawable.user
+            R.drawable.hiking,
+            R.drawable.writing,
+            R.drawable.map,
+            R.drawable.gears
     };
 
     public GridAdapter(Context c) {

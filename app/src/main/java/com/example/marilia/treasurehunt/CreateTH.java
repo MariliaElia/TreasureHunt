@@ -30,8 +30,12 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+/**
+ * CreateTH class gets the information the user has input and creates a Treasure Hunt
+ */
 public class  CreateTH extends AppCompatActivity {
     private static final String TAG = "CreateTH";
+    private static final String STATUS_DEVELOPMENT = "development";
 
     private TextView displayOpenDate;
     private TextView displayClosingDate;
@@ -52,8 +56,6 @@ public class  CreateTH extends AppCompatActivity {
     int minutes = cal.get(Calendar.MINUTE);
     String currentDate = day + "-" + month + "-" + year;
 
-    public static TreasureHunt th;
-
     public EditText titleText, descriptionText, countryText, cityText;
     public String title, description, country, town;
     public Date dateCreated, openDate, closingDate, startTime, endTime;
@@ -61,10 +63,7 @@ public class  CreateTH extends AppCompatActivity {
     public Button addCluesBn;
 
     private SharedPreferenceConfig preferenceConfig;
-    String username;
-    User user;
-    int userID;
-    long thID;
+    int userID, thID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +78,7 @@ public class  CreateTH extends AppCompatActivity {
         countryText = (EditText) findViewById(R.id.country);
         dateCreated = stringToDate(currentDate);
 
-        /* Select Open Date */
+        /* Select Open Date and Time */
         //Get view element for open date
         displayOpenDate = (TextView) findViewById((R.id.openDate));
         //add click listener to text view
@@ -98,7 +97,7 @@ public class  CreateTH extends AppCompatActivity {
             }
         });
 
-        /* Closing Date */
+        /* Closing Date and Time*/
         //Get view element for closing date
         displayClosingDate = (TextView) findViewById((R.id.closingDate));
         //add click listener to text view
@@ -117,10 +116,7 @@ public class  CreateTH extends AppCompatActivity {
             }
         });
 
-        //Get current user
-        user = preferenceConfig.getUserLoggedIn();
-        username = user.username;
-
+        //Add Clues clicked
         addCluesBn = (Button) findViewById(R.id.addClues);
            addCluesBn.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -134,29 +130,48 @@ public class  CreateTH extends AppCompatActivity {
                     town = cityText.getText().toString();
                     country = countryText.getText().toString();
 
-                    new InsertIntoDatabaseTask().execute();
+                    if (title.isEmpty() && description.isEmpty() && town.isEmpty()) {
+                        //If null display message to user
+                        Toast toast = Toast.makeText(CreateTH.this,
+                                "Title,description and city can't be left empty!",
+                                Toast.LENGTH_LONG);
+                        toast.show();
+                    } else {
+                        //Input into database
+                        new InsertIntoDatabaseTask().execute();
+                    }
                 }
            });
     }
 
+    /**
+     * Starts the ClueMaps activity, passing the id of the treasure hunt just created
+     */
     private void callClueMapsActivity(){
         Intent intent = new Intent(CreateTH.this, ClueMapsActivity.class);
-        intent.putExtra("THID", (int) thID);
+        intent.putExtra("THID", thID);
         startActivity(intent);
+
+        //finish current activity
         finish();
     }
 
-    /** Database **/
+    /**
+     * Create a treasure hunt object and insert it the database
+     */
     private class InsertIntoDatabaseTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
-            String status = "development";
-            th = new TreasureHunt(title, description, dateCreated, openDate, startTime, closingDate, startTime, country, town, userID, status);
-            thID = Login.appDatabase.treasureHuntDao().insertTreasureHunt(th);
+            TreasureHunt th = new TreasureHunt(title, description, dateCreated, openDate, startTime, closingDate, startTime, country, town, userID, STATUS_DEVELOPMENT);
+            thID = (int) Login.appDatabase.treasureHuntDao().insertTreasureHunt(th);
 
             return null;
         }
 
+        /**
+         * After the above task finishes call Clue-Maps activity
+         * @param aVoid
+         */
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
@@ -194,7 +209,6 @@ public class  CreateTH extends AppCompatActivity {
         activeTimeDisplay = null;
     }
 
-
     /** Date Picker Dialog methods **/
     public void showDateDialog(TextView dateDisplay, int year, int month, int day){
         activeDateDisplay = dateDisplay;
@@ -206,8 +220,8 @@ public class  CreateTH extends AppCompatActivity {
         public void onDateSet(DatePicker view, int year, int month, int day) {
             month = month + 1;
             String date = day + "-" + month + "-" + year;
-            Log.d(TAG, date);
             activeDateDisplay.setText(date);
+
             if (activeDateDisplay == displayOpenDate) {
                 openDate = stringToDate(date);
             } else if (activeDateDisplay == displayClosingDate){
@@ -237,6 +251,11 @@ public class  CreateTH extends AppCompatActivity {
         return null;
     }
 
+    /**
+     * takes a string in a date format and converts it to date
+     * @param dateString
+     * @return date
+     */
     public Date stringToDate(String dateString){
         try {
             dateCreated = new SimpleDateFormat("dd-MM-yyyy").parse(dateString);
@@ -247,6 +266,11 @@ public class  CreateTH extends AppCompatActivity {
         return dateCreated;
     }
 
+    /**
+     * takes string in a time-date format and converts it to date
+     * @param timeString
+     * @return
+     */
     public Date stringToTime(String timeString){
         try {
             time = new SimpleDateFormat("HH:mm").parse(timeString);

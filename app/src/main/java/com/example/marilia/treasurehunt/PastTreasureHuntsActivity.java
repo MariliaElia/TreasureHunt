@@ -11,21 +11,21 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.example.marilia.treasurehunt.database.TreasureHunt;
-import com.example.marilia.treasurehunt.database.User;
 
 /**
- * MyTreasureHunts Activity gets all the treasure hunts created by the user logged in and displays
- * them
+ * PastTreasureHuntsActivity class gets all the treasure hunts completed by the user in the past and
+ * displays them
  */
-public class MyTreasureHuntsActivity extends AppCompatActivity implements ItemClickListener {
+public class PastTreasureHuntsActivity  extends AppCompatActivity implements ItemClickListener {
+    private static final String STATUS_COMPLETED = "completed";
     private RecyclerView recyclerView;
     private RecyclerView.Adapter rvAdapter;
     private RecyclerView.LayoutManager layoutManager;
     private SharedPreferenceConfig preferenceConfig;
 
     private TreasureHunt[] ths;
+    private int[] thIds;
     private int userID;
-    private String username;
     private TextView message;
 
     @Override
@@ -35,13 +35,12 @@ public class MyTreasureHuntsActivity extends AppCompatActivity implements ItemCl
 
         preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
         //get user logged in from local storage
-        User user = preferenceConfig.getUserLoggedIn();
-        username = user.username;
+        userID = preferenceConfig.getUserID();
 
         message = (TextView) findViewById(R.id.message);
 
-        //Find treasure hunts from database
-        new GetTreasureHuntsTask().execute();
+        //Find treasure hunts ids played by the user from database
+        new GetTreasureHuntIDsTask().execute();
     }
 
     /**
@@ -61,7 +60,7 @@ public class MyTreasureHuntsActivity extends AppCompatActivity implements ItemCl
     }
 
     /**
-     * If on of the treasure hunts is clicked take user to Treasure Hunt activity
+     * If one of the treasure hunts is clicked take user to Treasure Hunt activity
      * @param view
      * @param position
      */
@@ -73,26 +72,41 @@ public class MyTreasureHuntsActivity extends AppCompatActivity implements ItemCl
     }
 
     /**
-     * Using the userID load all treasure hunts from the database created by that user
+     * Using the userID load all treasure hunt ids from the database completed by that user
      */
-    private class GetTreasureHuntsTask extends AsyncTask<Void, Void, Void> {
+    private class GetTreasureHuntIDsTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
-            userID = Login.appDatabase.userDao().getUserID(username);
-            ths = Login.appDatabase.treasureHuntDao().loadAllTreasureHuntsCreatedBy(userID);
+            thIds = Login.appDatabase.playerDao().getTreasureHuntIDs(userID, STATUS_COMPLETED);
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            if (ths.length != 0) {
-                message.setText("My Treasure Hunts: ");
-                displayTreasureHunts();
+            if (thIds.length != 0) {
+                message.setText("Past games: ");
+                new GetTreasureHuntsTask().execute();
             } else {
-                message.setText("You have not created any treasure hunts yet.");
+                message.setText("You have not played any treasre hunts yet. ");
             }
         }
     }
 
+    /**
+     * Using the treasure hunt IDs load the treasure hunts from the database and display them
+     */
+    private class GetTreasureHuntsTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            ths = Login.appDatabase.treasureHuntDao().loadAllTreasureHuntsWith(thIds);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+                displayTreasureHunts();
+        }
+    }
 }

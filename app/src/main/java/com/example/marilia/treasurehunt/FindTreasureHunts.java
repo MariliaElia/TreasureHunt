@@ -15,6 +15,10 @@ import android.widget.Toast;
 import com.example.marilia.treasurehunt.database.TreasureHunt;
 import com.example.marilia.treasurehunt.database.User;
 
+/**
+ * Find Treasure Hunts searches the database according to user input(city name)
+ * and returns data displaying it to the user
+ */
 public class FindTreasureHunts extends AppCompatActivity implements ItemClickListener{
     private RecyclerView recyclerView;
     private RecyclerView.Adapter rvAdapter;
@@ -33,16 +37,23 @@ public class FindTreasureHunts extends AppCompatActivity implements ItemClickLis
         filterTown = (EditText) findViewById(R.id.town);
 
         find = (Button) findViewById(R.id.find);
+        //Find clicked
         find.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 town = filterTown.getText().toString();
+                //search the database
                 new FindTreasureHunts.GetTreasureHuntsTask().execute();
             }
         });
     }
 
+    /**
+     * Display the Treasure Hunts on a list
+     * @param ths
+     */
     private void displayTreasureHunts(TreasureHunt[] ths){
+        //Check that the database returned back data
         if (ths.length != 0 ) {
             recyclerView = (RecyclerView) findViewById(R.id.th_recycler_view);
 
@@ -55,6 +66,7 @@ public class FindTreasureHunts extends AppCompatActivity implements ItemClickLis
             DividerItemDecoration mDividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), 1);
             recyclerView.addItemDecoration(mDividerItemDecoration);
         } else {
+            //The array is empty, it means no treasure hunts in that exist are currently available
             Toast toast = Toast.makeText(FindTreasureHunts.this,
                     "No results found for this city!",
                     Toast.LENGTH_SHORT);
@@ -62,6 +74,12 @@ public class FindTreasureHunts extends AppCompatActivity implements ItemClickLis
         }
     }
 
+    /**
+     * When one of the treasure hunts gets clicked from the list, call Treasure Hunt activity
+     * and pass the treasure hunt clicked information
+     * @param view
+     * @param position
+     */
     @Override
     public void onClick(View view, int position) {
         Intent intent = new Intent(this, TreasureHuntActivity.class);
@@ -69,6 +87,9 @@ public class FindTreasureHunts extends AppCompatActivity implements ItemClickLis
         startActivity(intent);
     }
 
+    /**
+     * Loads all treasure hunts in city user searched for
+     */
     private class GetTreasureHuntsTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
@@ -76,6 +97,10 @@ public class FindTreasureHunts extends AppCompatActivity implements ItemClickLis
             return null;
         }
 
+        /**
+         * After the above task finishes, display results
+         * @param aVoid
+         */
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);

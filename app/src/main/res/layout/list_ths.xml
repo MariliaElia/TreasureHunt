@@ -5,6 +5,7 @@
     android:orientation="horizontal"
     android:id="@+id/treasureHunt"
     android:layout_margin="10dp"
+    android:background="@drawable/clueborder"
     android:baselineAligned="false">
 
     <LinearLayout

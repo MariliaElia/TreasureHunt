@@ -14,7 +14,7 @@
     <string name="description">Description</string>
     <string name="addClues">Add Clues</string>
     <string name="addClue">Add Clue</string>
-    <string name="createTH">Create Treasure Hunt</string>
+    <string name="createTH">Create A Treasure Hunt</string>
 
     <string name="username">Username</string>
     <string name="password">Password</string>
@@ -26,21 +26,18 @@
     <string name="dob">Date of Birth</string>
     <string name="register">Register</string>
     <string name="logout">Logout</string>
-    <string name="createdByMe">T.H. Created by me</string>
-    <string name="participatedIn">T.H. Participated In</string>
+    <string name="createdByMe">My Treasure Hunts</string>
+    <string name="participatedIn">Past Games</string>
 
     <string name="login_preference">com.example.marilia.treasurehunt_login_preference</string>
     <string name="login_status_preference">com.example.marilia.treasurehunt_login_status_preference</string>
-    <string name="title_activity_maps">Map</string>
-    <string name="title_activity_clue_maps">Map</string>
 
     <string name="cancel">Cancel</string>
     <string name="search">Search</string>
-    <string name="title_activity_game">Map</string>
-    <string name="title_activity_started">StartedActivity</string>
     <string name="here">I am Here!</string>
-    <string name="skip">Skip(-10)</string>
+    <string name="skip">Skip</string>
     <string name="startedTH">Started Treasure Hunts</string>
     <string name="play">Play Treasure Hunt</string>
+    <string name="congratulations">Congratulations! You finished!</string>
 
 </resources>

@@ -10,6 +10,10 @@ import android.widget.TextView;
 
 import com.example.marilia.treasurehunt.database.User;
 
+/**
+ * MyAccount class resets the local storage when the user logs out
+ * and allows the user to see the treasure hunts he had had created or had participated in
+ */
 public class MyAccount  extends AppCompatActivity {
     private static final String TAG = "MyAccount";
     Button logoutBn, createdByMeBn, participatedInBn;
@@ -23,28 +27,33 @@ public class MyAccount  extends AppCompatActivity {
 
         preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
 
+        //Created By Me Button takes the user to the activity displaying the treasure hunts he had created
         createdByMeBn = (Button) findViewById(R.id.createdByMe);
         createdByMeBn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MyAccount.this, MyTreasureHuntsActivity.class));
-                finish();
+            }
+        });
+
+        //Participated In Button takes the user to the actvity displaying the treasure hunts he completed
+        participatedInBn = (Button) findViewById(R.id.paricipatedIn);
+        participatedInBn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MyAccount.this, PastTreasureHuntsActivity.class));
             }
         });
 
         logoutBn = (Button) findViewById(R.id.logoutBn);
-        accountMessage = (TextView) findViewById(R.id.accountMessage);
-
-        User user = preferenceConfig.getUserLoggedIn();
-
-        Log.d(TAG, "This is the current user: " + user.username);
-        accountMessage.setText("Hello " + user.username);
         logoutBn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Clear local data
                 preferenceConfig.clearUserData();
                 preferenceConfig.setLoginStatus(false);
                 Intent intent = new Intent(getApplicationContext(), Login.class);
+                //end all activities
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
             }

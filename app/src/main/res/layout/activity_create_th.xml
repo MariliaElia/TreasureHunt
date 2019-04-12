@@ -6,8 +6,9 @@
     android:layout_height="match_parent"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
+    android:layout_marginBottom="@dimen/bottomMargin"
     android:orientation="vertical"
-    android:layout_marginTop="50dp"
+    android:layout_marginTop="20dp"
     tools:contexts = "tabian.com.datepickerdialog.CreateTH">
 
     <EditText

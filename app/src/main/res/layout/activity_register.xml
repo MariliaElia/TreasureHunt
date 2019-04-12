@@ -14,11 +14,6 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
         android:hint="@string/name" />
-    <EditText
-        android:id="@+id/surname"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/surname" />
 
     <EditText
         android:id="@+id/email"

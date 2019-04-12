@@ -14,18 +14,23 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.marilia.treasurehunt.database.User;
 
 import java.util.Calendar;
 import java.util.Date;
 
+/**
+ * Register class, creates a user and adds him to the database, checking first that the user
+ * does not already have an account
+ */
 public class Register extends AppCompatActivity {
     public Button registerBn;
-    public EditText nameText, surnameText, passwordText, emailText, usernameText;
+    public EditText nameText, passwordText, emailText, usernameText;
     public String name, surname, username, password, email, dob;
-    public static final int initialPoints = 100;
-    private static final String TAG = "Register";
+    User checkUsername, checkEmail;
+    public static final int INITIAL_POINTS = 100;
 
     DatePickerDialog.OnDateSetListener dateListener;
 
@@ -35,14 +40,11 @@ public class Register extends AppCompatActivity {
         setContentView(R.layout.activity_register);
 
         nameText = (EditText) findViewById(R.id.name);
-        surnameText = (EditText) findViewById(R.id.surname);
         emailText = (EditText) findViewById(R.id.email);
         passwordText = (EditText) findViewById(R.id.password);
         usernameText = (EditText) findViewById(R.id.username);
         registerBn = (Button) findViewById(R.id.registerBn);
 
-
-        /* Select Open Date */
         //Get view element for open date
         final TextView displayDob = (TextView) findViewById((R.id.dob));
         //add click listener to text view
@@ -65,43 +67,83 @@ public class Register extends AppCompatActivity {
             }
         });
 
-         dateListener = new DatePickerDialog.OnDateSetListener() {
+        dateListener = new DatePickerDialog.OnDateSetListener() {
              @Override
              public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                 month = month + 1;
-                 dob = day + "/" + month + "/" + year;
-                 displayDob.setText(dob);
+                month = month + 1;
+                dob = day + "/" + month + "/" + year;
+                displayDob.setText(dob);
              }
-         };
+        };
 
+        //Register button clicked
         registerBn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Get text user has input in text boxes
                 name = nameText.getText().toString();
-                surname = surnameText.getText().toString();
                 username = usernameText.getText().toString();
                 password = passwordText.getText().toString();
                 email = emailText.getText().toString();
 
-                new InsertIntoDatabaseTask().execute();
-
-                startActivity(new Intent(v.getContext(), Login.class));
-                finish();
+                //Check that password, username and email are not null
+                if (password.isEmpty() || username.isEmpty() || email.isEmpty()){
+                    //If null display message to user
+                    Toast toast = Toast.makeText(Register.this,
+                            "Username, password and email can't be left empty!",
+                            Toast.LENGTH_SHORT);
+                    toast.show();
+                } else {
+                    //before creating the user, check that the user doesn't already exist
+                    new SearchDatabaseTask().execute();
+                }
             }
         });
 
     }
 
-    private class InsertIntoDatabaseTask extends AsyncTask<Void, Void, Void> {
+    /**
+     * Search database to check that the user does not already exist
+     */
+    private class SearchDatabaseTask extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            User registeredUserData = new User(name, surname,username,password, dob, email, initialPoints);
-            Login.appDatabase.userDao().insertUser(registeredUserData);
-
-            Log.d(TAG, registeredUserData.username.toString());
-
+            checkUsername = Login.appDatabase.userDao().findUserByUsername(username);
+            checkEmail = Login.appDatabase.userDao().findUserByEmail(email);
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (checkUsername == null && checkEmail == null) {
+                new InsertIntoDatabaseTask().execute();
+            } else {
+                Toast toast = Toast.makeText(Register.this,
+                        "Username or email already exist! Please use different input data!",
+                        Toast.LENGTH_SHORT);
+                toast.show();
+            }
+        }
+    }
+
+    /**
+     * Add user to database
+     */
+    private class InsertIntoDatabaseTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            User registeredUserData = new User(name, surname,username,password, dob, email, INITIAL_POINTS);
+            Login.appDatabase.userDao().insertUser(registeredUserData);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            startActivity(new Intent(Register.this, Login.class));
+            finish();
         }
     }
 

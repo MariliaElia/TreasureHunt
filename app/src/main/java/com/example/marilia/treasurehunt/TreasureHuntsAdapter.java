@@ -23,17 +23,10 @@ public class TreasureHuntsAdapter extends RecyclerView.Adapter<TreasureHuntsAdap
     private Context context;
     private ItemClickListener itemClickListener;
 
-    public TreasureHuntsAdapter(TreasureHunt[] ths) { this.ths = ths; }
 
     public TreasureHuntsAdapter(TreasureHunt[] ths, ItemClickListener itemClickListener) {
         this.ths = ths;
         this.itemClickListener = itemClickListener;
-    }
-
-    public TreasureHuntsAdapter(Context cont, TreasureHunt[] th) {
-        super();
-        this.ths = th;
-        context = cont;
     }
 
     @Override

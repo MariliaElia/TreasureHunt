@@ -12,6 +12,7 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -33,7 +34,12 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.Date;
 
-public class GameActivity extends FragmentActivity implements OnMapReadyCallback {
+/**
+ * GameActivity class implements the main functionalities of the game
+ * - Checks the user location according to the clue location
+ * - Updates user and player data
+ */
+public class GameActivity extends AppCompatActivity implements OnMapReadyCallback {
     private static final String TAG = "GameActivity";
     private static final int REQUEST_CODE = 1000;
     public static final float DEFAULT_ZOOM = 15f;
@@ -55,7 +61,7 @@ public class GameActivity extends FragmentActivity implements OnMapReadyCallback
     private SharedPreferenceConfig preferenceConfig;
 
     private Location currentLocation;
-    private int thID, userID, lastClueID;
+    private int thID, userID, lastClueID, playerID;
     private Clue cl;
     private double lonClue, latClue;
     private double currentLon, currentLat;
@@ -67,42 +73,43 @@ public class GameActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
+        //Gets treasure hunt ID and playerID from previous activity
         Intent intent = getIntent();
         thID = intent.getIntExtra("treasureHuntID", -1);
+        playerID = intent.getIntExtra("playerID", -1);
 
+        //Get current userID from local storage
         preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
         userID = preferenceConfig.getUserID();
 
+        //Finds the clue that needs to get displayed in this activity
         new FindClueIDTask().execute();
 
-        //Check Permissions
+        //Check Location Permissions
         getLocationPermission();
 
         btn_here = (Button) findViewById(R.id.here);
+        //I am here button clicked
         btn_here.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Get lon lat for this clue
-                //Check if user is in that location
-                //If correct
-                //   make playerClue status from pending to completed
-                //   add one to noOfSuccessfulClues
-                //   add points to Player
-                //Else
-                //   user is in the wrong location, display message
-
+                //check that location permissions have been granted
                 if (locationPermissionGranted) {
+                    //current user location
                     currentLat = currentLocation.getLatitude();
                     currentLon = currentLocation.getLongitude();
 
+                    //Check if user is in that location
                     boolean checkLonLat = checkLonLat(currentLat, currentLon, lonClue,latClue);
 
                     if (checkLonLat) {
-                        //updatePlayerClue status
+                        //updatePlayerTH values (noOfSuccessfulClues and points)
                         new UpdatePlayerTHValuesTask().execute();
+                        // make playerClue status from pending to completed
                         new UpdatePlayerClueStatusTask().execute();
 
                     } else {
+                        //user is in the wrong location, display message
                         Toast.makeText(getApplicationContext(),"Oops! Looks like this isn't the correct location!",Toast.LENGTH_LONG).show();
                     }
                 }
@@ -110,7 +117,13 @@ public class GameActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
         skip = (Button) findViewById(R.id.skip);
+        //skip clicked
         skip.setOnClickListener(new View.OnClickListener() {
+            /**
+             * Display an alert dialog to the user, letting them know that if they skip they will
+             * lose points
+             * @param v
+             */
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(GameActivity.this);
@@ -122,6 +135,7 @@ public class GameActivity extends FragmentActivity implements OnMapReadyCallback
                 });
                 builder.setNegativeButton("Skip", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        //Decrease points from user
                         new UpdatesSkipStatusTask().execute();
                     }
                 });
@@ -134,15 +148,41 @@ public class GameActivity extends FragmentActivity implements OnMapReadyCallback
         //decrease points of user from initial table
     }
 
-    public void callGameActivity() {
-        Intent intent = new Intent(GameActivity.this, GameActivity.class);
-        intent.putExtra("treasureHuntID", thID);
+    /**
+     * start FinishedActivity
+     */
+    public void callFinishedActivity() {
+        Intent intent = new Intent(GameActivity.this, FinishedActivity.class);
+        intent.putExtra("playerID", playerID);
         startActivity(intent);
+        //end current activity
         finish();
     }
 
+    /**
+     * Start GameActivity
+     */
+    public void callGameActivity() {
+        Intent intent = new Intent(GameActivity.this, GameActivity.class);
+        intent.putExtra("treasureHuntID", thID);
+        intent.putExtra("playerID", playerID);
+        startActivity(intent);
+        //end current activity
+        finish();
+    }
+
+    /**
+     * This method checks if the user is at the correct location, according to the longitude and
+     * latitude of the clue
+     * @param currentLat
+     * @param currentLon
+     * @param lonClue
+     * @param latClue
+     * @return true/false
+     */
     private boolean checkLonLat(double currentLat, double currentLon, double lonClue, double latClue) {
-        double meters = 17;
+        //allowing the user to be a few meters away from the actual position of the clue
+        double meters = 80;
 
         // number of km per degree = 111.32 in google maps
         // 1km in degree
@@ -150,6 +190,7 @@ public class GameActivity extends FragmentActivity implements OnMapReadyCallback
         // 1m in degree
         double mInDegree = kmInDegree /1000;
 
+        //offset value
         double offset = meters * mInDegree;
 
         double newPosLat = latClue + offset;
@@ -161,21 +202,28 @@ public class GameActivity extends FragmentActivity implements OnMapReadyCallback
         double newPosLon = lonClue + (offset / Math.cos(latClue*radians));
         double newNegLon = lonClue + (-offset / Math.cos(latClue*radians));
 
-        if ((currentLat<newPosLat && currentLat>newNegLat) && (currentLon>newNegLon && currentLon<newPosLon)){
+        //if the location is somewhere between the new lon and lat values then the user is at the
+        //correct place
+        if ((currentLat<newPosLat && currentLat>newNegLat) &&
+                (currentLon>newNegLon && currentLon<newPosLon)){
             return true;
         } else {
             return false;
         }
     }
 
-    /** DATABASE CALLS **/
+    /* DATABASE CALLS */
 
+    /**
+     * The user has selected to skip the clue, database gets updated
+     * points get decreased from the User
+     */
     private class UpdatesSkipStatusTask extends  AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
             //Decrease points from the user
             Login.appDatabase.userDao().updateUserPoints(POINTS_SKIP, userID);
-            //Make status skipped
+            //Make status of the clue skipped
             Login.appDatabase.playerClueDao().updatePlayerClueStatus(STATUS_SKIPPED, thID, userID, lastClueID);
             //check if remaining clues for this treasure hunt
             cl = Login.appDatabase.clueDao().loadClue(thID, lastClueID + 1);
@@ -186,7 +234,9 @@ public class GameActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+            //if there are still clues for this treasure hunt
             if (cl != null) {
+                //insert new PlayerClue in the database
                 new CreatePlayerClueTask().execute();
             } else {
                 //Player has finished the treasure hunt
@@ -195,6 +245,10 @@ public class GameActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    /**
+     * User found clue location, update player-clue status to completed
+     * check if the treasure hunt has any more clues left
+     */
     private class UpdatePlayerClueStatusTask extends  AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
@@ -215,6 +269,10 @@ public class GameActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    /**
+     * User has finished the treasure hunt, so update the status to completed
+     * add finished date and time
+     */
     private class UpdateTreasureHuntStatusTask extends  AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
@@ -223,15 +281,21 @@ public class GameActivity extends FragmentActivity implements OnMapReadyCallback
             return null;
         }
 
+        /**
+         * After the above task finishes call FinishedActivity
+         * @param aVoid
+         */
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            Intent intent = new Intent(GameActivity.this, FinishedActivity.class);
-            startActivity(intent);
-            finish();
+            callFinishedActivity();
         }
     }
 
+    /**
+     * Go to the next clue, which means create a new playerClue field, increasing the value of the
+     * clueID by one as the user has now moved on to the next clue
+     */
     private class CreatePlayerClueTask extends  AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
@@ -240,6 +304,10 @@ public class GameActivity extends FragmentActivity implements OnMapReadyCallback
             return null;
         }
 
+        /**
+         * After the above task finishes call the GameActivity
+         * @param aVoid
+         */
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
@@ -247,6 +315,11 @@ public class GameActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    /**
+     * Update the player values
+     * noOfSuccessfulClues
+     * cluesFound
+     */
     private class UpdatePlayerTHValuesTask extends  AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
@@ -266,6 +339,10 @@ public class GameActivity extends FragmentActivity implements OnMapReadyCallback
             return null;
         }
 
+        /**
+         * After the above task finsihes, use the id found to get the clue
+         * @param aVoid
+         */
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
@@ -274,7 +351,7 @@ public class GameActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     /**
-     * Finds the clue from the TreasureHunt table by using the clueID from last AsyncTask
+     * Finds the clue from the TreasureHunt table by using the clueID from FindClueIDTask
      */
     private class FindClueTask extends  AsyncTask<Void, Void, Void> {
         @Override
@@ -298,8 +375,9 @@ public class GameActivity extends FragmentActivity implements OnMapReadyCallback
         clue.setText(cl.clue);
         lonClue = cl.longitude;
         latClue = cl.latitude;
-
     }
+
+    /* LOCATION FUNCTIONALITIES */
 
     /**
      * Initializes map

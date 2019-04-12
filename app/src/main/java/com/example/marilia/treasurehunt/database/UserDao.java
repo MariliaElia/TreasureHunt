@@ -21,6 +21,12 @@ public interface UserDao {
     @Query("SELECT * FROM User WHERE username == :username")
     User findUserByUsername(String username);
 
+    @Query("SELECT * FROM User WHERE email == :email")
+    User findUserByEmail(String email);
+
+    @Query("SELECT points FROM User WHERE username == :username")
+    int findUserPoints(String username);
+
     @Query(("SELECT id FROM User WHERE username == :username"))
     int getUserID(String username);
 

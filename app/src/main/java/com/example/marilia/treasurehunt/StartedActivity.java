@@ -16,6 +16,10 @@ import android.widget.Toast;
 
 import com.example.marilia.treasurehunt.database.TreasureHunt;
 
+/**
+ * Started Activity takes all the treasure hunts that have been started
+ * by the user and displays them
+ */
 public class StartedActivity extends AppCompatActivity implements ItemClickListener {
     private final static String STATUS_PENDING = "pending";
     private RecyclerView recyclerView;
@@ -31,17 +35,24 @@ public class StartedActivity extends AppCompatActivity implements ItemClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_started);
+        setContentView(R.layout.activity_list_ths);
 
         message = (TextView) findViewById(R.id.message);
 
         preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
         userID = preferenceConfig.getUserID();
+
+        //Search the database
         new GetTreasureHuntIDsTask().execute();
 
     }
 
+    /**
+     * Display treasure hunts to the user
+     * @param ths
+     */
     private void displayTreasureHunts(TreasureHunt[] ths){
+        //check that the user has started playing a treasure hunt
         if (ths.length != 0 ) {
             message.setText("Currenlty Playing: ");
             recyclerView = (RecyclerView) findViewById(R.id.th_recycler_view);
@@ -59,14 +70,21 @@ public class StartedActivity extends AppCompatActivity implements ItemClickListe
         }
     }
 
+    /**
+     * If the user clicks on the treasure hunt start TreasureHunt activity
+     * @param view
+     * @param position
+     */
     @Override
     public void onClick(View view, int position) {
         Intent intent = new Intent(this, TreasureHuntActivity.class);
         intent.putExtra("treasureHunt", ths[position]);
         startActivity(intent);
-        finish();
     }
 
+    /**
+     * Find all treasure hunt ids from the database where there status == pending for current user
+     */
     private class GetTreasureHuntIDsTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
@@ -81,6 +99,9 @@ public class StartedActivity extends AppCompatActivity implements ItemClickListe
         }
     }
 
+    /**
+     * Find the treasure hunts using the ids returned from previous function and display them
+     */
     private class GetTreasureHuntsTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {

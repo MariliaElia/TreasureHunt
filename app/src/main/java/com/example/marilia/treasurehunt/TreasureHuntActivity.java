@@ -22,28 +22,25 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+/**
+ * TreasureHuntActivity class displays all the information for a treasure hunt and allows the user
+ * to start playing by initializing the necessary fields in the database entities
+ */
 public class TreasureHuntActivity extends AppCompatActivity {
     private static final String TAG = "TreasureHuntActivity";
+    private SharedPreferenceConfig preferenceConfig;
 
     //As the player is just starting the Treasure hunt the variables are set to 0;
     final int CLUES_FOUND = 0;
     final int PLAYER_POINTS = 0;
     final String STATUS = "pending";
 
-    String title, description;
     Date openDate, startTime, closeDate, endTime, currentDate;
-
     TextView titleTV, descriptionTV, startTV, endTV;
-    int thID, userID, firstClueID;
-
-    Button play;
-
+    int thID, userID, firstClueID, playerID;
+    String title, description;
     Player player;
-    Clue cl;
-
-    private SharedPreferenceConfig preferenceConfig;
-
-
+    Button play;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -67,6 +64,7 @@ public class TreasureHuntActivity extends AppCompatActivity {
         startTV = (TextView) findViewById(R.id.starts);
         endTV = (TextView) findViewById(R.id.ends);
 
+        //Display treasure hunt details
         titleTV.setText(title);
         descriptionTV.setText(description);
         startTV.setText(dateToString(openDate, startTime));
@@ -75,6 +73,7 @@ public class TreasureHuntActivity extends AppCompatActivity {
         preferenceConfig = new SharedPreferenceConfig(getApplicationContext());
         userID = preferenceConfig.getUserID();
 
+        //Play Button
         play = (Button) findViewById(R.id.play);
         play.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,70 +85,9 @@ public class TreasureHuntActivity extends AppCompatActivity {
         });
     }
 
-    public void callGameActivity() {
-        Intent intent = new Intent(TreasureHuntActivity.this, GameActivity.class);
-        intent.putExtra("treasureHuntID", thID);
-        startActivity(intent);
-        finish();
-    }
-
-    public String dateToString(Date date, Date time){
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        String strDate = dateFormat.format(date);
-
-        DateFormat timeFormat = new SimpleDateFormat("HH:mm");
-        String strTime = timeFormat.format(time);
-
-        String dateTime = strDate + " " + strTime;
-
-        return dateTime;
-    }
-
-    private class CreatePlayerClueTask extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... voids) {
-            PlayerClue playerClue = new PlayerClue(thID, userID, firstClueID, STATUS);
-            Login.appDatabase.playerClueDao().insertPlayerClue(playerClue);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            callGameActivity();
-        }
-    }
-
-    private class FindFirstClueIDTask extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... voids) {
-            firstClueID = Login.appDatabase.clueDao().loadFistClueID(thID);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            new CreatePlayerClueTask().execute();
-        }
-    }
-
-    private class InsertPlayerTask extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... voids) {
-            Player player = new Player(currentDate,currentDate, null,null,
-                    PLAYER_POINTS, CLUES_FOUND, STATUS, thID, userID);
-            Login.appDatabase.playerDao().insertPlayer(player);
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            new FindFirstClueIDTask().execute();
-        }
-    }
-
+    /**
+     * Firstly check if the user is already playing this TH by
+     */
     private class SearchPlayerTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
@@ -168,8 +106,95 @@ public class TreasureHuntActivity extends AppCompatActivity {
                 //Add it to treasure hunts currently played by the user
                 new InsertPlayerTask().execute();
             } else {
+                playerID = player.id;
                 callGameActivity();
             }
         }
     }
+
+    /**
+     * Create player for this treasure hunt, initialize values
+     */
+    private class InsertPlayerTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            Player player = new Player(currentDate,currentDate, null,null,
+                    PLAYER_POINTS, CLUES_FOUND, STATUS, thID, userID);
+            playerID = (int) Login.appDatabase.playerDao().insertPlayer(player);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            //Find the first clue for this treasure hunt currently started
+            new FindFirstClueIDTask().execute();
+        }
+    }
+
+    /**
+     * Using the treasure hunt ID find the first clue
+     */
+    private class FindFirstClueIDTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            firstClueID = Login.appDatabase.clueDao().loadFistClueID(thID);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            new CreatePlayerClueTask().execute();
+        }
+    }
+
+    /**
+     * Create PlayerClue object and insert it to the database
+     * It saves the current state of the player for this treasure hunt
+     */
+    private class CreatePlayerClueTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            PlayerClue playerClue = new PlayerClue(thID, userID, firstClueID, STATUS);
+            Login.appDatabase.playerClueDao().insertPlayerClue(playerClue);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            callGameActivity();
+        }
+    }
+
+    /**
+     * Start the GameActivity
+     */
+    public void callGameActivity() {
+        Intent intent = new Intent(TreasureHuntActivity.this, GameActivity.class);
+        intent.putExtra("treasureHuntID", thID);
+        intent.putExtra("playerID", playerID);
+        startActivity(intent);
+        finish();
+    }
+
+    /**
+     * From date format to string
+     * @param date
+     * @param time
+     * @return
+     */
+    public String dateToString(Date date, Date time){
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        String strDate = dateFormat.format(date);
+
+        DateFormat timeFormat = new SimpleDateFormat("HH:mm");
+        String strTime = timeFormat.format(time);
+
+        String dateTime = strDate + " " + strTime;
+
+        return dateTime;
+    }
+
 }
