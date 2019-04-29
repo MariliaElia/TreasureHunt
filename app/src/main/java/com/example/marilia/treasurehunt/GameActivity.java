@@ -61,7 +61,7 @@ public class GameActivity extends AppCompatActivity implements OnMapReadyCallbac
     private SharedPreferenceConfig preferenceConfig;
 
     private Location currentLocation;
-    private int thID, userID, lastClueID, playerID;
+    private int thID, userID, lastClueID, playerID, points;
     private Clue cl;
     private double lonClue, latClue;
     private double currentLon, currentLat;
@@ -135,8 +135,7 @@ public class GameActivity extends AppCompatActivity implements OnMapReadyCallbac
                 });
                 builder.setNegativeButton("Skip", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        //Decrease points from user
-                        new UpdatesSkipStatusTask().execute();
+                        new GetUserPointsTask().execute();
                     }
                 });
                 builder.show();
@@ -204,12 +203,8 @@ public class GameActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         //if the location is somewhere between the new lon and lat values then the user is at the
         //correct place
-        if ((currentLat<newPosLat && currentLat>newNegLat) &&
-                (currentLon>newNegLon && currentLon<newPosLon)){
-            return true;
-        } else {
-            return false;
-        }
+        return (currentLat < newPosLat && currentLat > newNegLat) &&
+                (currentLon > newNegLon && currentLon < newPosLon);
     }
 
     /* DATABASE CALLS */
@@ -241,6 +236,29 @@ public class GameActivity extends AppCompatActivity implements OnMapReadyCallbac
             } else {
                 //Player has finished the treasure hunt
                 new UpdateTreasureHuntStatusTask().execute();
+            }
+        }
+    }
+
+    /**
+     * Gets the current user overall points, and checks wether the user can skip a clue
+     * according to the value returned
+     */
+    private class GetUserPointsTask extends  AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            points = Login.appDatabase.userDao().getUserPoints(userID);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (points>=10) {
+                //Decrease points from user
+                new UpdatesSkipStatusTask().execute();
+            } else {
+                Toast.makeText(getApplicationContext(),"You don't have enough points to skip a clue!",Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -417,7 +435,6 @@ public class GameActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (locationPermissionGranted) {
             //Stop Location Updates
             fusedLocationProviderClient.removeLocationUpdates(locationCallback);
-            Log.d(TAG, "Stop Location Updates");
         }
 
     }
@@ -429,7 +446,6 @@ public class GameActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
         } else {
-            Log.d(TAG, "Permissions granted");
             initMap();
             //permission granted
             buildLocationRequest();
@@ -441,7 +457,6 @@ public class GameActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             //Start Location Updates
             startLocationUpdates();
-
         }
     }
 
@@ -460,7 +475,6 @@ public class GameActivity extends AppCompatActivity implements OnMapReadyCallbac
      * Requests location updates
      */
     private void startLocationUpdates() {
-        Log.d(TAG, "Location updates requested");
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -501,8 +515,8 @@ public class GameActivity extends AppCompatActivity implements OnMapReadyCallbac
             case REQUEST_CODE:
                 if(grantResults.length > 0) {
                     if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        //permission succeeded
                         initMap();
-                        Log.d(TAG, "onRequestPermissionResult: persmission succeeded");
                         locationPermissionGranted = true;
                         buildLocationRequest();
                         buildLocationCallback();

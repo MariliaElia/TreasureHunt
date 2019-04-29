@@ -23,6 +23,9 @@ public class TreasureHuntsAdapter extends RecyclerView.Adapter<TreasureHuntsAdap
     private Context context;
     private ItemClickListener itemClickListener;
 
+    public TreasureHuntsAdapter(TreasureHunt[] ths){
+        this.ths = ths;
+    }
 
     public TreasureHuntsAdapter(TreasureHunt[] ths, ItemClickListener itemClickListener) {
         this.ths = ths;
@@ -33,8 +36,13 @@ public class TreasureHuntsAdapter extends RecyclerView.Adapter<TreasureHuntsAdap
     public TreasureHuntsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = (View) LayoutInflater.from(parent.getContext()).inflate(R.layout.list_ths,
                 parent, false);
-        ViewHolder holder = new ViewHolder(v, itemClickListener);
-        return holder;
+        if (itemClickListener != null) {
+            ViewHolder holder = new ViewHolder(v, itemClickListener);
+            return holder;
+        } else {
+            ViewHolder holder = new ViewHolder(v);
+            return holder;
+        }
     }
 
     @Override
@@ -42,8 +50,8 @@ public class TreasureHuntsAdapter extends RecyclerView.Adapter<TreasureHuntsAdap
         if (holder!=null && ths[position]!=null) {
             holder.title.setText(ths[position].title);
             holder.description.setText(ths[position].description);
-            holder.start.setText("Starts: " + dateToString(ths[position].open_on));
-            holder.end.setText("Ends: " + dateToString(ths[position].close_on));
+            holder.start.setText("Opens: " + dateToString(ths[position].open_on));
+            holder.end.setText("Closes: " + dateToString(ths[position].close_on));
             holder.place.setText(ths[position].town + "," + ths[position].country);
 
         }
@@ -75,6 +83,15 @@ public class TreasureHuntsAdapter extends RecyclerView.Adapter<TreasureHuntsAdap
 
             //attached an OnClickListener to the textView
             textView.setOnClickListener(this);
+        }
+
+        public ViewHolder(View textView){
+            super(textView);
+            title = (TextView) textView.findViewById(R.id.title);
+            description = (TextView) textView.findViewById(R.id.description);
+            start = (TextView) textView.findViewById(R.id.start);
+            end = (TextView) textView.findViewById(R.id.end);
+            place = (TextView) textView.findViewById(R.id.place);
         }
 
 

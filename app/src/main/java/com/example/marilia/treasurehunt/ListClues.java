@@ -71,8 +71,6 @@ public class ListClues extends AppCompatActivity {
                         Toast.LENGTH_SHORT);
                 toast.show();
 
-                //take the user back to the main activity
-                startActivity(new Intent(ListClues.this, MainActivity.class));
                 //end this activity
                 finish();
             }
@@ -92,7 +90,6 @@ public class ListClues extends AppCompatActivity {
                 toast.show();
 
                 //Take the user to the main activity
-                startActivity(new Intent(ListClues.this, MainActivity.class));
                 finish();
             }
         });

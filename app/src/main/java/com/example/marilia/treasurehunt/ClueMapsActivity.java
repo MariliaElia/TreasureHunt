@@ -63,7 +63,7 @@ public class ClueMapsActivity extends AppCompatActivity implements OnMapReadyCal
                 clue = clueText.getText().toString();
                 description = descriptionText.getText().toString();
 
-                if (clue.isEmpty() && latitude == 0 && longitude == 0) {
+                if (clue.isEmpty() || latitude == 0 || longitude == 0) {
                     //If null display message to user
                     Toast toast = Toast.makeText(ClueMapsActivity.this,
                             "You have to fill in the fields and select a position on the map to continue!",

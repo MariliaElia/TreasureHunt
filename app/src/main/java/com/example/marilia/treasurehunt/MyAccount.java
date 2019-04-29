@@ -3,21 +3,15 @@ package com.example.marilia.treasurehunt;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
-
-import com.example.marilia.treasurehunt.database.User;
 
 /**
  * MyAccount class resets the local storage when the user logs out
  * and allows the user to see the treasure hunts he had had created or had participated in
  */
 public class MyAccount  extends AppCompatActivity {
-    private static final String TAG = "MyAccount";
     Button logoutBn, createdByMeBn, participatedInBn;
-    TextView accountMessage;
     private SharedPreferenceConfig preferenceConfig;
 
     @Override
@@ -58,6 +52,7 @@ public class MyAccount  extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
     }
 
 }

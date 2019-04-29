@@ -127,13 +127,14 @@ public class  CreateTH extends AppCompatActivity {
                     //Get information user has input
                     title = titleText.getText().toString();
                     description = descriptionText.getText().toString();
-                    town = cityText.getText().toString();
+                    town = cityText.getText().toString().toLowerCase();
                     country = countryText.getText().toString();
 
-                    if (title.isEmpty() && description.isEmpty() && town.isEmpty()) {
+                    if (title.isEmpty() || description.isEmpty() || town.isEmpty() || startTime == null || openDate == null
+                    ||endTime == null || closingDate == null) {
                         //If null display message to user
                         Toast toast = Toast.makeText(CreateTH.this,
-                                "Title,description and city can't be left empty!",
+                                "Title,description, dates and city can't be left empty!",
                                 Toast.LENGTH_LONG);
                         toast.show();
                     } else {

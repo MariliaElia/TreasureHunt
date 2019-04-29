@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Treasure Hunt</string>
+    <string name="app_name">ClueSeeker</string>
     <string name="create_activity">Create Treasure Hunt</string>
     <string name="clue">Clue</string>
     <string name="account">My Account</string>
@@ -14,7 +14,7 @@
     <string name="description">Description</string>
     <string name="addClues">Add Clues</string>
     <string name="addClue">Add Clue</string>
-    <string name="createTH">Create A Treasure Hunt</string>
+    <string name="createTH">Create Treasure Hunt</string>
 
     <string name="username">Username</string>
     <string name="password">Password</string>
@@ -38,6 +38,4 @@
     <string name="skip">Skip</string>
     <string name="startedTH">Started Treasure Hunts</string>
     <string name="play">Play Treasure Hunt</string>
-    <string name="congratulations">Congratulations! You finished!</string>
-
 </resources>

@@ -15,6 +15,10 @@ import android.widget.Toast;
 import com.example.marilia.treasurehunt.database.TreasureHunt;
 import com.example.marilia.treasurehunt.database.User;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Find Treasure Hunts searches the database according to user input(city name)
  * and returns data displaying it to the user
@@ -28,6 +32,7 @@ public class FindTreasureHunts extends AppCompatActivity implements ItemClickLis
     private EditText filterTown;
     private String town;
     private Button find;
+    Date currentDate = new Date();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +46,7 @@ public class FindTreasureHunts extends AppCompatActivity implements ItemClickLis
         find.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                town = filterTown.getText().toString();
+                town = filterTown.getText().toString().toLowerCase().replaceAll("\\s+","");
                 //search the database
                 new FindTreasureHunts.GetTreasureHuntsTask().execute();
             }
@@ -93,7 +98,7 @@ public class FindTreasureHunts extends AppCompatActivity implements ItemClickLis
     private class GetTreasureHuntsTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
-            ths = Login.appDatabase.treasureHuntDao().loadAllTreasureHuntsInTown(town);
+            ths = Login.appDatabase.treasureHuntDao().loadAllTreasureHuntsInTown(town, currentDate);
             return null;
         }
 

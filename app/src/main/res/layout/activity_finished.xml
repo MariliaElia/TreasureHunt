@@ -12,18 +12,23 @@
     tools:context=".FinishedActivity">
 
     <TextView
+        android:id="@+id/congratulations"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textStyle="bold"
         android:textColor="@color/colorPrimaryDark"
         android:textAllCaps="true"
         android:layout_marginTop="50dp"
-        android:text="@string/congratulations"/>
+        android:layout_gravity="center"
+        android:text="bdhbwifbyfbbuberbervuebvehvbehvbhebvvehvbhejvbjevbjvb"
+        android:background="@drawable/clueborder"/>
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/topMargin">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -41,7 +46,9 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_gravity="center"
+        >
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

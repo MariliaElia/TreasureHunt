@@ -47,6 +47,16 @@ public class StartedActivity extends AppCompatActivity implements ItemClickListe
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (recyclerView != null ) {
+            recyclerView.removeAllViewsInLayout();
+        }
+        //Search the database
+        new GetTreasureHuntIDsTask().execute();
+    }
+
     /**
      * Display treasure hunts to the user
      * @param ths
@@ -66,7 +76,7 @@ public class StartedActivity extends AppCompatActivity implements ItemClickListe
             DividerItemDecoration mDividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), 1);
             recyclerView.addItemDecoration(mDividerItemDecoration);
         } else {
-            message.setText("Search for Treasure Hunts and start playing!");
+            message.setText("Go back and search for Treasure Hunts to start playing!");
         }
     }
 

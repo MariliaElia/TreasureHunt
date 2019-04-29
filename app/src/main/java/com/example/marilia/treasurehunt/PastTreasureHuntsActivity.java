@@ -53,7 +53,7 @@ public class PastTreasureHuntsActivity  extends AppCompatActivity implements Ite
         recyclerView.setLayoutManager(layoutManager);
 
         //passing the onItemClickListener interface to the constructor of the TreasureHuntsAdaptor
-        rvAdapter = new TreasureHuntsAdapter(ths, this);
+        rvAdapter = new TreasureHuntsAdapter(ths);
         recyclerView.setAdapter(rvAdapter);
         DividerItemDecoration mDividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), 1);
         recyclerView.addItemDecoration(mDividerItemDecoration);

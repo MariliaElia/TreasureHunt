@@ -110,10 +110,6 @@ public class TreasureHunt implements Parcelable {
     public int getId() { return id; }
     public String getTitle() { return title; }
     public String getDescription() { return description; }
-    public Date getDate_created() { return date_created; }
-    public Date getOpen_on() { return open_on; }
-    public Date getClose_on() {return close_on; }
-    public String getCountry() { return country; }
     public String getTown() { return town; }
     public int getUser_id() { return user_id; }
 
@@ -121,10 +117,6 @@ public class TreasureHunt implements Parcelable {
     public void setId(int id) { this.id = id; }
     public void setTitle(String title) { this.title = title; }
     public void setDescription(String description) { this.description = description; }
-    public void setDate_created(Date date_created) { this.date_created = date_created; }
-    public void setOpen_on(Date open_on) { this.open_on = open_on; }
-    public void setClose_on(Date close_on) { this.close_on = close_on; }
-    public void setCountry(String country) { this.country = country; }
     public void setTown(String town) { this.town = town; }
     public void setUser_id(int user_id) { this.user_id = user_id; }
 

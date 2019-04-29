@@ -32,4 +32,12 @@
         android:layout_gravity="bottom"
         android:text="@string/logout" />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="Icons made by Freepik from www.flaticon.com" />
+
+
+
 </LinearLayout>
+

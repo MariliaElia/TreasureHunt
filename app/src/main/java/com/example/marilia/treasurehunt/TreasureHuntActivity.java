@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.marilia.treasurehunt.database.Clue;
 import com.example.marilia.treasurehunt.database.Player;
@@ -79,8 +80,16 @@ public class TreasureHuntActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 currentDate = new Date();
-                //Check if it is already started by the user
-                new SearchPlayerTask().execute();
+                //current Date is before openDate
+                if (currentDate.compareTo(openDate) < 0) {
+                    Toast toast = Toast.makeText(TreasureHuntActivity.this,
+                            "Treasure Hunt is not open yet!",
+                            Toast.LENGTH_SHORT);
+                    toast.show();
+                } else {
+                    //Check if it is already started by the user
+                    new SearchPlayerTask().execute();
+                }
             }
         });
     }

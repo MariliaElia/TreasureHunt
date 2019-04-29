@@ -142,7 +142,6 @@ public class Register extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            startActivity(new Intent(Register.this, Login.class));
             finish();
         }
     }

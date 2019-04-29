@@ -13,7 +13,7 @@ import com.example.marilia.treasurehunt.database.TreasureHunt;
  * Finished Activity class displays to the user the scores he gained while playing the Treasure Hunt
  */
 public class FinishedActivity extends AppCompatActivity {
-    TextView pointsGainedText, cluesFoundText;
+    TextView pointsGainedText, cluesFoundText, congratulationsText;
     int playerID;
     Player player;
 
@@ -31,7 +31,7 @@ public class FinishedActivity extends AppCompatActivity {
 
         pointsGainedText = (TextView) findViewById(R.id.pointsGained);
         cluesFoundText = (TextView) findViewById(R.id.cluesFound);
-
+        congratulationsText = (TextView) findViewById(R.id.congratulations);
     }
 
     /**
@@ -40,6 +40,11 @@ public class FinishedActivity extends AppCompatActivity {
     public void displayData(){
         pointsGainedText.setText(Integer.toString(player.total_points));
         cluesFoundText.setText(Integer.toString(player.successful_clues));
+        if (player.successful_clues != 0 ) {
+            congratulationsText.setText("Congratulations!\nYou finished the Treasure Hunt!");
+        } else {
+            congratulationsText.setText("You finished the Treasure Hunt!");
+        }
     }
 
     /**
