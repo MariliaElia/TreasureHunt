@@ -1,4 +1,4 @@
-# TreasureHunt
+# A city-wide treasure hunt mobile application
 
 This mobile application was developed as part of my undergraduate research project at The University of Sheffield. 
 
